@@ -1,5 +1,6 @@
 from django.db import models 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 class BigCategory(models.Model):
     big_category = models.CharField(max_length=20, default='その他', unique=True)
@@ -38,7 +39,7 @@ class Item(models.Model):
         , default=set_small_default_category
     )
     price = models.PositiveIntegerField(default=0)
-    paid_at = models.DateTimeField()
+    paid_at = models.DateField(default=timezone.now)
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
 
     def __str__(self):         
