@@ -1,0 +1,39 @@
+{% extends 'app/base.html' %} 
+ 
+{% block content %} 
+
+<div>
+    <a href="{% url 'app:index' %}">ホームに戻る</a> 
+</div> 
+
+<form action="{% url 'app:items_new' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <table>
+        <tr>             
+            <th>項目</th>             
+            <td>{{ form.item }}</td>         
+        </tr>
+        <tr>
+            <th>説明</th>
+            <td>{{ form.description }}</td>
+        </tr>         
+        <tr>             
+            <th>大カテゴリー</th>
+            <td>{{ form.big_category }}</td>
+        </tr>
+        <tr>
+            <th>小カテゴリー</th>             
+            <td>{{ form.small_category }}</td>        
+        </tr>
+        <tr>             
+            <th>費用</th>
+            <td>{{ form.price }}</td>
+        </tr>
+        <tr>             
+            <th>日付</th>
+            <td>{{ form.paid_at }}</td>
+        </tr>
+    </table>
+    <button type="submit" class="btn">保存</button> 
+</form> 
+ 
+{% endblock %}

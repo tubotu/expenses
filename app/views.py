@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm, ItemForm
+from django.contrib import messages
 
 def index(request):
     return render(request, 'app/index.html')
@@ -19,3 +21,18 @@ def signup(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'app/signup.html', {'form': form})
+
+@login_required
+def items_new(request):
+    if request.method == "POST":
+        form = ItemForm(request.POST)
+        print(form)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.user = request.user
+            item.save()
+            messages.success(request, "投稿が完了しました！")
+        return redirect('app:index')     
+    else:          
+        form = ItemForm()
+    return render(request, 'app/items_new.html', {'form': form})
