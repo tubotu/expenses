@@ -8,12 +8,6 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = ('user_name',)
- 
-class ItemForm(ModelForm):
-    class Meta:
-        model = Item
-        fields = ['item', 'description', 'big_category'
-        , 'small_category', 'price', 'paid_at']
 
 class BigCategoryForm(ModelForm):
     class Meta:
@@ -28,13 +22,11 @@ class SmallCategoryForm(ModelForm):
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = ['item', 'description', 'big_category'
-        , 'small_category', 'price', 'paid_at']
+        fields = ['item', 'description', 'small_category', 'price', 'paid_at']
 
 class PostCreateForm(forms.ModelForm):
-    # 親カテゴリの選択欄がないと絞り込めないので、定義する。
-    parent_category = forms.ModelChoiceField(
-        label='大カテゴリ',
+    big_category = forms.ModelChoiceField(
+        label='Big category',
         queryset=BigCategory.objects,
         required=False
     )
@@ -43,4 +35,4 @@ class PostCreateForm(forms.ModelForm):
         model = Item
         fields = '__all__'
 
-    field_order = ('item', 'big_category', 'small_category')
+    field_order = ('item', 'description', 'big_category', 'small_category', 'price', 'paid_at')

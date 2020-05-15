@@ -63,11 +63,32 @@ def small_category_new(request):
         form = SmallCategoryForm()
     return render(request, 'app/category_new2.html', {'form': form})
 
+
+from django.http import JsonResponse
 from django.views import generic
 from .forms import PostCreateForm
-from .models import Item
+from .models import Item, SmallCategory
+
 
 class PostCreate(generic.CreateView):
     model = Item
     form_class = PostCreateForm
     success_url = '/'
+
+def ajax_get_category(request):
+    pk = request.GET.get('pk')
+    # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
+    if not pk:
+        small_category_list = SmallCategory.objects.all()
+
+    # pkがあれば、そのpkでカテゴリを絞り込む
+    else:
+        small_category_list = SmallCategory.objects.filter(big_category__pk=pk)
+    print(small_category_list)
+
+    # json形式のリスト
+    small_category_list = [{'pk': small_category.pk, 'name': small_category.small_category} for small_category in small_category_list]
+
+    # JSONで返す。
+    return JsonResponse({'smallCategoryList': small_category_list})
+
