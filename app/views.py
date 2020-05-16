@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, ItemForm, BigCategoryForm, SmallCategoryForm
+from .forms import CustomUserCreationForm, ItemForm, BigCategoryForm, SmallCategoryForm, PostCreateForm
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views import generic
+from .models import Item, SmallCategory
 
 def index(request):
     return render(request, 'app/index.html')
@@ -62,12 +65,6 @@ def small_category_new(request):
     else:          
         form = SmallCategoryForm()
     return render(request, 'app/category_new2.html', {'form': form})
-
-
-from django.http import JsonResponse
-from django.views import generic
-from .forms import PostCreateForm
-from .models import Item, SmallCategory
 
 
 class PostCreate(generic.CreateView):
