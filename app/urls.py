@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 app_name = 'app'
 urlpatterns = [
     path('', views.index, name='index'),
@@ -12,6 +13,6 @@ urlpatterns = [
     path('category/new/2', views.small_category_new, name='category_new2'),
     #path('items/new/', views.items_new, name='items_new'), 
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('item/new', views.PostCreate.as_view(), name='item_new'),
+    path('item/new/', login_required(views.PostCreate.as_view()), name='item_new'),
     path('api/category/get/', views.ajax_get_category, name='ajax_get_category') 
 ] 

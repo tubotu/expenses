@@ -17,10 +17,10 @@ def signup(request):
             new_user = form.save()
             input_user_name = form.cleaned_data['user_name']
             input_password = form.cleaned_data['password1']
-            new_user = authenticate(email=input_email, password=input_password)
-        if new_user is not None:
-            login(request, new_user)
-            return redirect('app:index')
+            new_user = authenticate(email=input_user_name, password=input_password)
+            if new_user is not None:
+                login(request, new_user)
+                return redirect('app:index')
     else:
         form = CustomUserCreationForm()
     return render(request, 'app/signup.html', {'form': form})
@@ -71,6 +71,15 @@ class PostCreate(generic.CreateView):
     model = Item
     form_class = PostCreateForm
     success_url = '/'
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(PostCreate, self).form_valid(form)
+    def get(self, request, *args, **kwargs):
+        """
+        ここに大カテゴリ絞り込む処理
+        """
+        return render(request, 'myapp/index.html',  {"item": item})
+
 
 def ajax_get_category(request):
     pk = request.GET.get('pk')
@@ -81,7 +90,6 @@ def ajax_get_category(request):
     # pkがあれば、そのpkでカテゴリを絞り込む
     else:
         small_category_list = SmallCategory.objects.filter(big_category__pk=pk)
-    print(small_category_list)
 
     # json形式のリスト
     small_category_list = [{'pk': small_category.pk, 'name': small_category.small_category} for small_category in small_category_list]
