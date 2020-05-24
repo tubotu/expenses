@@ -27,9 +27,14 @@ class ItemForm(ModelForm):
 class PostCreateForm(forms.ModelForm):
     big_category = forms.ModelChoiceField(
         label='Big category',
-        queryset=BigCategory.objects,
+        queryset=None,
         required=False
     )
+    def __init__(self, user_ids, *args, **kwargs):
+        super(PostCreateForm, self).__init__(*args, **kwargs)
+        # queryset に group_ids で filter した クエリーセットをセットする 
+        self.fields['big_category'].queryset = BigCategory.objects.filter(user_id=user_ids)
+        self.fields['small_category'].queryset = BigCategory.objects.filter(user_id=user_ids)
 
     class Meta:
         model = Item

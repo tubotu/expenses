@@ -74,11 +74,12 @@ class PostCreate(generic.CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(PostCreate, self).form_valid(form)
-    def get(self, request, *args, **kwargs):
-        """
-        ここに大カテゴリ絞り込む処理
-        """
-        return render(request, 'myapp/index.html',  {"item": item})
+    def get_form_kwargs(self):
+        kwargs = super(PostCreate, self).get_form_kwargs()
+        # Group.idのリストを取得
+        print(self.request.user.id)
+        kwargs['user_ids'] = self.request.user.id
+        return kwargs
 
 
 def ajax_get_category(request):
