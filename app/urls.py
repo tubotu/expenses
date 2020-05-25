@@ -3,6 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 app_name = "app"
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("signup/", views.signup, name="signup"),
@@ -12,7 +13,11 @@ urlpatterns = [
         name="login",
     ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
-    path("graph_outgo/", views.graph_outgo, name="graph_outgo"),
-    path("popup_table/<int:point_id>/", views.popup_table, name="popup_table"),
+    path("chartjs/", views.chartjs, name="chartjs"),
+    path(
+        "api/index/get_itemList/", views.ajax_get_itemList, name="ajax_get_itemList"
+    ),  # URLは何でもいい
+    path(
+        "api/index/get_category/", views.ajax_get_category, name="ajax_get_category"
+    ),  # URLは何でもいい
 ]
-
