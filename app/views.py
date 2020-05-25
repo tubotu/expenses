@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, ItemForm, BigCategoryForm, SmallCategoryForm, PostCreateForm, GraphCategoryForm
+from .forms import CustomUserCreationForm, ItemForm, BigCategoryForm, SmallCategoryForm, PostCreateForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views import generic
@@ -30,7 +30,6 @@ def signup(request):
 def items_new(request):
     if request.method == "POST":
         form = ItemForm(request.POST)
-        print(form)
         if form.is_valid():
             item = form.save(commit=False)
             item.user = request.user
