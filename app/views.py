@@ -1,4 +1,103 @@
-<<<<<<< HEAD
+from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm, ItemForm, BigCategoryForm, SmallCategoryForm, PostCreateForm, GraphCategoryForm
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views import generic
+from .models import Item
+from django.shortcuts import render, redirect
+
+def index(request):
+    return render(request, 'app/index.html')
+
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            input_user_name = form.cleaned_data['user_name']
+            input_password = form.cleaned_data['password1']
+            new_user = authenticate(email=input_user_name, password=input_password)
+            if new_user is not None:
+                login(request, new_user)
+                return redirect('app:index')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'app/signup.html', {'form': form})
+
+@login_required
+def items_new(request):
+    if request.method == "POST":
+        form = ItemForm(request.POST)
+        print(form)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.user = request.user
+            item.save()
+            messages.success(request, "投稿が完了しました！")
+        return redirect('app:index')     
+    else:          
+        form = ItemForm()
+    return render(request, 'app/items_new.html', {'form': form})
+
+@login_required
+def big_category_new(request):
+    if request.method == "POST":
+        form = BigCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.user = request.user
+            category.save()
+            messages.success(request, "投稿が完了しました！")
+        return redirect('app:index')     
+    else:          
+        form = BigCategoryForm()
+    return render(request, 'app/category_new.html', {'form': form})
+
+@login_required
+def small_category_new(request):
+    if request.method == "POST":
+        form = SmallCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            messages.success(request, "投稿が完了しました！")
+        return redirect('app:index')     
+    else:          
+        form = SmallCategoryForm()
+    return render(request, 'app/category_new2.html', {'form': form})
+
+
+class PostCreate(generic.CreateView):
+    model = Item
+    form_class = PostCreateForm
+    success_url = '/'
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super(PostCreate, self).form_valid(form)
+    def get_form_kwargs(self):
+        kwargs = super(PostCreate, self).get_form_kwargs()
+        kwargs['user_ids'] = self.request.user.id
+        return kwargs
+
+
+def ajax_get_category(request):
+    pk = request.GET.get('pk')
+    # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
+    if not pk:
+        small_category_list = SmallCategory.objects.all()
+
+    # pkがあれば、そのpkでカテゴリを絞り込む
+    else:
+        small_category_list = SmallCategory.objects.filter(big_category__pk=pk)
+
+    # json形式のリスト
+    small_category_list = [{'pk': small_category.pk, 'name': small_category.small_category} for small_category in small_category_list]
+
+    # JSONで返す。
+    return JsonResponse({'smallCategoryList': small_category_list})
+
+
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.contrib.auth import authenticate, login
 from .forms import CustomUserCreationForm, GraphCategoryForm
@@ -11,39 +110,11 @@ from operator import itemgetter
 from django.core import serializers
 
 from django.http import JsonResponse
-=======
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import CustomUserCreationForm
 
-from bokeh.models import ColumnDataSource, OpenURL, TapTool, CustomJS
-from bokeh.plotting import figure
-from bokeh.resources import CDN
-from bokeh.embed import components
->>>>>>> 2e536c5c9c8ba1e6aaac3b665c67a644444cf175
 
-
-def index(request):
-    return render(request, "app/index.html")
-
-
-def signup(request):
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            new_user = form.save()
-            input_user_name = form.cleaned_data["user_name"]
-            input_password = form.cleaned_data["password1"]
-            new_user = authenticate(email=input_email, password=input_password)
-        if new_user is not None:
-            login(request, new_user)
-            return redirect("app:index")
-    else:
-        form = CustomUserCreationForm()
-    return render(request, "app/signup.html", {"form": form})
-
-
-<<<<<<< HEAD
 def chartjs(request):
 
     items = get_list_or_404(Item)
@@ -107,27 +178,7 @@ def ajax_get_itemList(request):
 
     return JsonResponse({"itemList": item_list})
 
-
-def ajax_get_category(request):
-
-    pk = request.GET.get("pk")
-    # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
-    if not pk:
-        category_list = SmallCategory.objects.all()
-
-    # pkがあれば、そのpkでカテゴリを絞り込む
-    else:
-        category_list = SmallCategory.objects.filter(big_category__pk=pk)
-
-    # [ {'name': 'サッカー', 'pk': '3'}, {...}, {...} ] という感じのリストになる。
-    category_list = [
-        {"pk": category.pk, "small_category": category.small_category}
-        for category in category_list
-    ]
-
-    # JSONで返す。
-    return JsonResponse({"categoryList": category_list})
-=======
+ 
 def graph_outgo(request):
 
     x = [1, 2, 3, 4, 5]
@@ -169,11 +220,9 @@ def graph_outgo(request):
         {"cdn_js": cdn_js, "cdn_css": cdn_css, "script": script, "div": div},
     )
 
-
 def popup_table(request, point_id):
 
     price = request.session["price"]
     print(price)
 
     return render(request, "app/popup_table.html", {"price": price[str(point_id)]})
->>>>>>> 2e536c5c9c8ba1e6aaac3b665c67a644444cf175
