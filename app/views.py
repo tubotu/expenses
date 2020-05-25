@@ -76,8 +76,6 @@ class PostCreate(generic.CreateView):
         return super(PostCreate, self).form_valid(form)
     def get_form_kwargs(self):
         kwargs = super(PostCreate, self).get_form_kwargs()
-        # Group.idのリストを取得
-        print(self.request.user.id)
         kwargs['user_ids'] = self.request.user.id
         return kwargs
 
