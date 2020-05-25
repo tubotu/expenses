@@ -98,23 +98,6 @@ def ajax_get_category(request):
     return JsonResponse({'smallCategoryList': small_category_list})
 
 
-from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
-from django.contrib.auth import authenticate, login
-from .forms import CustomUserCreationForm, GraphCategoryForm
-from .models import BigCategory, SmallCategory, Item
-
-import numpy
-from datetime import datetime
-from itertools import groupby
-from operator import itemgetter
-from django.core import serializers
-
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import CustomUserCreationForm
-
-
 def chartjs(request):
 
     items = get_list_or_404(Item)
