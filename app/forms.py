@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+<<<<<<< HEAD
 from django import forms
 from .models import BigCategory, SmallCategory
 from django.shortcuts import get_list_or_404
@@ -35,3 +36,9 @@ class GraphCategoryForm(forms.Form):
     small = forms.ChoiceField(
         label="小カテゴリ", widget=forms.Select, choices=small_category, required=True,
     )
+=======
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('user_name',)
+>>>>>>> 2e536c5c9c8ba1e6aaac3b665c67a644444cf175

@@ -120,7 +120,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+<<<<<<< HEAD
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "asset"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+=======
+
+>>>>>>> 2e536c5c9c8ba1e6aaac3b665c67a644444cf175
 # セッションを毎回更新する
 SESSION_SAVE_EVERY_REQUEST = True
