@@ -27,20 +27,6 @@ def signup(request):
     return render(request, 'app/signup.html', {'form': form})
 
 @login_required
-def items_new(request):
-    if request.method == "POST":
-        form = ItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.user = request.user
-            item.save()
-            messages.success(request, "投稿が完了しました！")
-        return redirect('app:index')     
-    else:          
-        form = ItemForm()
-    return render(request, 'app/items_new.html', {'form': form})
-
-@login_required
 def big_category_new(request):
     if request.method == "POST":
         form = BigCategoryForm(request.POST)
