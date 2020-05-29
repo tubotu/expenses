@@ -71,6 +71,7 @@ class PostCreate(generic.CreateView):
     model = Item
     form_class = PostCreateForm
     success_url = '/'
+    template_name = "app/item_new.html"
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super(PostCreate, self).form_valid(form)
