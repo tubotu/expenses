@@ -7,12 +7,12 @@ from .forms import (
     BigCategoryForm,
     SmallCategoryForm,
     PostCreateForm,
+    GraphForm,
 )
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views import generic
-from .models import Item
-from django.shortcuts import render, redirect
+from .models import Item, BigCategory, SmallCategory
 
 from itertools import groupby
 from operator import itemgetter
@@ -85,6 +85,7 @@ class PostCreate(generic.CreateView):
     model = Item
     form_class = PostCreateForm
     success_url = "/"
+    template_name = "app/item_new.html"
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -116,44 +117,83 @@ def ajax_get_category(request):
     return JsonResponse({"smallCategoryList": small_category_list})
 
 
-def graph(request):
+class Graph(generic.ListView):
+    model = Item
+    success_url = "/"
+    template_name = "app/graph.html"
 
-    items = get_list_or_404(Item)
+    def post(self, request, *args, **kwargs):
+        # 検索ボタンを押した後の処理
+        form_value = [
+            self.request.POST.get("big_category", None),
+            self.request.POST.get("small_category", None),
+        ]
+        request.session["form_value"] = form_value
 
-    paid_at = [item.paid_at for item in items]
-    price = [item.price for item in items]
-    xy = zip(paid_at, price, items)
-    xy = sorted(xy, key=itemgetter(0))
+        return self.get(request, *args, **kwargs)
 
-    x = []
-    y = []
-    list_item = []
-    for key, group in groupby(xy, itemgetter(0)):
-        x.append(key)
-        sum_price = 0
-        tmp_item = []
-        for item in list(group):
-            sum_price += item[1]
-            tmp_item.append(item[2].id)
-        y.append(sum_price)
-        list_item.append(tmp_item)
+    def get_queryset(self):
+        # itemをすべて表示
+        user_id = self.request.user.id
 
-    point_id = list(range(len(x)))
+        return Item.objects.filter(small_category__big_category__user_id=user_id)
 
-    request.session.clear()
+    def get_context_data(self, **kwargs):
+        # formとグラフの描画に必要な情報をページに送信する
+        context = super().get_context_data(**kwargs)
+        context["form"] = GraphForm(user_id=self.request.user.id)
+        # postの処理
+        big_category = ""
+        small_category = ""
+        if "form_value" in self.request.session:
+            form_value = self.request.session["form_value"]
+            big_category = form_value[0]
+            small_category = form_value[1]
+        # postに合わせてアイテムを削減
+        items = Item.objects.all()
+        if big_category:
+            items = items.filter(small_category__big_category=big_category)
+        if small_category:
+            items = items.filter(small_category=small_category)
+        # グラフの描画に必要な情報の計算
+        paid_at = [item.paid_at for item in items]
+        price = [item.price for item in items]
+        xy = zip(paid_at, price, items)
+        xy = sorted(xy, key=itemgetter(0))
 
-    for id_ in point_id:
-        if "item_id" in request.session:
-            request.session["item_id"][str(id_)] = list_item[id_]
-        else:
-            request.session["item_id"] = {str(id_): list_item[id_]}
+        x = []
+        y = []
+        list_item = []
+        for key, group in groupby(xy, itemgetter(0)):
+            x.append(key)
+            sum_price = 0
+            tmp_item = []
+            for item in list(group):
+                sum_price += item[1]
+                tmp_item.append(item[2].id)
+            y.append(sum_price)
+            list_item.append(tmp_item)
 
-    x = [tmp.strftime("%m-%d") for tmp in x]
+        point_id = list(range(len(x)))
 
-    return render(request, "app/graph.html", {"x_axis": x, "y_axis": y})
+        self.request.session["item_id"] = {}
+
+        for id_ in point_id:
+            if "item_id" in self.request.session:
+                self.request.session["item_id"][str(id_)] = list_item[id_]
+            else:
+                self.request.session["item_id"] = {str(id_): list_item[id_]}
+
+        x = [tmp.strftime("%m-%d") for tmp in x]
+
+        context["x_axis"] = x
+        context["y_axis"] = y
+
+        return context
 
 
 def ajax_get_item(request):
+    # グラフのクリックした点に合わせて関連するアイテムを表示
 
     point_id = request.GET.get("point_id")
     item_id = request.session["item_id"]
