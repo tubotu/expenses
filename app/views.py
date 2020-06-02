@@ -142,19 +142,29 @@ class Graph(generic.ListView):
         # formとグラフの描画に必要な情報をページに送信する
         context = super().get_context_data(**kwargs)
         context["form"] = GraphForm(user_id=self.request.user.id)
-        # postの処理
-        big_category = ""
-        small_category = ""
+        # postの処理（小カテゴリだけを選択して送信されると困るなぁ）
         if "form_value" in self.request.session:
             form_value = self.request.session["form_value"]
             big_category = form_value[0]
             small_category = form_value[1]
-        # postに合わせてアイテムを削減
-        items = Item.objects.all()
+        else:
+            big_category = ""
+            small_category = ""
+        # postに合わせてアイテムを削減，カテゴリの表示名を取得（すべてのカテゴリ対応を改善したい）
+        user_id = self.request.user.id
+        items = Item.objects.filter(small_category__big_category__user_id=user_id)
         if big_category:
             items = items.filter(small_category__big_category=big_category)
+            tmp_query = BigCategory.objects.filter(pk=big_category)
+            context["big_category"] = tmp_query[0].big_category
+        else:
+            context["big_category"] = "すべての大カテゴリ―"
         if small_category:
             items = items.filter(small_category=small_category)
+            tmp_query = SmallCategory.objects.filter(pk=small_category)
+            context["small_category"] = tmp_query[0].small_category
+        else:
+            context["small_category"] = "すべての小カテゴリ―"
         # グラフの描画に必要な情報の計算
         paid_at = [item.paid_at for item in items]
         price = [item.price for item in items]
@@ -194,7 +204,6 @@ class Graph(generic.ListView):
 
 def ajax_get_item(request):
     # グラフのクリックした点に合わせて関連するアイテムを表示
-
     point_id = request.GET.get("point_id")
     item_id = request.session["item_id"]
     item_id = item_id[str(point_id)]
@@ -206,7 +215,9 @@ def ajax_get_item(request):
     item_list = [
         {
             "item": item.item,
-            # "big_category": str(item.big_category),
+            "big_category": BigCategory.objects.filter(smallcategory__item__pk=item.id)[
+                0
+            ].big_category,
             "small_category": str(item.small_category),
             "price": item.price,
         }
