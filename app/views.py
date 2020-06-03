@@ -196,8 +196,13 @@ class Graph(generic.ListView):
 
         x = [tmp.strftime("%m-%d") for tmp in x]
 
-        context["x_axis"] = x
-        context["y_axis"] = y
+        month_total = []
+        for month, total in zip(x, y):
+            month_total.append({"month": month, "total": total})
+        context["month_total"] = month_total
+        # context["axes"] = {"x":x, "y",y}
+        # context["x_axis"] = x
+        # context["y_axis"] = y
 
         return context
 
