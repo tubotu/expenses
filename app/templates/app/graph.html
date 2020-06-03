@@ -46,28 +46,28 @@
     <canvas id=outgoCanvas height="200px"></canvas>
     <script type="text/javascript">
 
+        // グラフの中で参照できる形式に変換
+        var array = [];
+        {% for tmp in x_axis %}
+        array.push("{{ tmp }}");
+        {% endfor %}
+        // グラフの最大値を推定
+        var itemMax = Math.max.apply(null, {{ y_axis }});
+        var index = Math.floor(Math.log10(itemMax));
+        itemMax = Math.ceil(itemMax / 10 ** index) * 10 ** index;
+        // グラフの描画
         var drawGraph = function (x, y) {
-            /* idが"radar-chart"の要素を取得 */
             var outgoCanvas = document.getElementById("outgoCanvas");
-            var ctx = outgoCanvas.getContext('2d')
-
-            var array = []
-            {% for tmp in x_axis %}
-            array.push("{{ tmp }}")
-            {% endfor %}
-
-            var itemMax = Math.max.apply(null, {{ y_axis }})
-
-        /* 上記要素にチャートを描画　*/
-        var lineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [...array],
-                datasets: [{
-                    label: "A",
-                    pointHitRadius: 15,
-                    data: {{ y_axis }},
-        },
+            var ctx = outgoCanvas.getContext('2d');
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...array],
+                    datasets: [{
+                        label: "A",
+                        pointHitRadius: 15,
+                        data: {{ y_axis }},
+            },
         ]
         },
         options: {
@@ -82,17 +82,17 @@
                 yAxes: [{
                     ticks: {
                         suggestedMax: itemMax,
-                        suggestedMin: 0,
-                        stepSize: 1000,
+                        suggestedMin: 0, // 要改善
+                        stepSize: itemMax / 2, // 適当
                         callback: function (value, index, values) {
-                            return value + '円'
+                            return value // + '円'
                         }
                     }
                 }]
             },
         }
         });
-
+        // グラフの点をクリックした際の処理を追加
         outgoCanvas.onclick = function (e) {
 
             var item = lineChart.getElementAtEvent(e);
@@ -125,7 +125,6 @@
         window.onload = function () {
             drawGraph("{{x.0}}", "{{y}}");
         };
-
     </script>
     <!--Itemの一覧を表示，恐らく削除-->
     <ul>
@@ -137,7 +136,6 @@
 
 </html>
 {%endblock%}
-
 
 
 {% block extrajs %}
@@ -178,7 +176,6 @@
     bigCategoryElement.on('change', () => {
         changeCategory();
     });
-
     // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
     if (bigCategoryElement.val()) {
         const selectedCategory = smallCategoryElement.val();
