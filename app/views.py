@@ -126,7 +126,6 @@ class Graph(generic.ListView):
     def get_context_data(self, **kwargs):
         # formとグラフの描画に必要な情報をページに送信する
         context = super().get_context_data(**kwargs)
-        context["form"] = GraphForm(user_id=self.request.user.id)
         # postの処理（小カテゴリだけを選択して送信されると困るなぁ）
         if "form_value" in self.request.session:
             form_value = self.request.session["form_value"]
@@ -135,6 +134,10 @@ class Graph(generic.ListView):
         else:
             big_category = ""
             small_category = ""
+
+        context["form"] = GraphForm(
+            user_id=self.request.user.id, cat=small_category
+        )  # catは削除を検討中
         # postに合わせてアイテムを削減，カテゴリの表示名を取得（すべてのカテゴリ対応を改善したい）
         # contextに選択したカテゴリ名を含めるかどうかは要検討
         user_id = self.request.user.id
@@ -142,17 +145,29 @@ class Graph(generic.ListView):
         if big_category:
             items = items.filter(small_category__big_category=big_category)
             tmp_query = BigCategory.objects.filter(pk=big_category)
-            context["big_category"] = tmp_query[0].big_category
-            context["form"].fields["big_category"].initial = big_category
+            context["big_category"] = {
+                "name": tmp_query[0].big_category,
+                "pk": tmp_query[0].pk,
+            }
+            # context["form"].fields["big_category"].initial = big_category
         else:
-            context["big_category"] = "すべての大カテゴリ―"
+            context["big_category"] = {
+                "name": "すべて",
+                "pk": "",
+            }
         if small_category:
             items = items.filter(small_category=small_category)
             tmp_query = SmallCategory.objects.filter(pk=small_category)
-            context["small_category"] = tmp_query[0].small_category
-            context["form"].fields["small_category"].initial = small_category
+            context["small_category"] = {
+                "name": tmp_query[0].small_category,
+                "pk": tmp_query[0].pk,
+            }
+            # context["form"].fields["small_category"].initial = small_category
         else:
-            context["small_category"] = "すべての小カテゴリ―"
+            context["small_category"] = {
+                "name": "すべて",
+                "pk": "",
+            }
         # グラフの描画に必要な情報の計算
         paid_at = [item.paid_at for item in items]
         price = [item.price for item in items]

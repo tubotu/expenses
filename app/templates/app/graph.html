@@ -29,14 +29,16 @@
     <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
         <table>
             <tr>
-                <th>大カテゴリー</th>
+                <th>大カテゴリ</th>
                 <td>{{ form.big_category }}</td>
-                <th>小カテゴリー</th>
+                <th>小カテゴリ</th>
                 <td>{{ form.small_category }}</td>
+                <th><button type="submit" class="btn">検索</button></th>
             </tr>
         </table>
-        <button type="submit" class="btn">検索</button>
     </form>
+
+    <h1>{{big_category.name}} - {{small_category.name}}</h1>
 
     <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
 
@@ -162,7 +164,7 @@
                 'pk': bigCategoryElement.val(),
             }
         }).done(response => {
-            // 子カテゴリの選択肢を作成・追加。
+            // 子カテゴリの選択肢を作成・追加
             const option = $('<option>');
             option.val("");
             option.text("すべて");
@@ -177,7 +179,6 @@
             if (select !== undefined) {
                 smallCategoryElement.val(select);
             }
-
         });
     };
     // 大カテゴリのオプション追加をここに書く
