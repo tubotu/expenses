@@ -116,12 +116,6 @@
                     $("#wrap").html("");
                     target = $("#wrap")
                     for (var n in itemList) {
-                        /*
-                        var text = '<li>';
-                        line = itemList[n].item + "/" + itemList[n].big_category + "/" + itemList[n].small_category + "/" + itemList[n].price;
-                        text = text + line + '</li>';
-                        $(target).append(text);
-                        */
                         var text = '<table>\n<tr>\n';
                         line = "<th>" + itemList[n].item + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td><td>" + itemList[n].price + "</td>";
                         text = text + line + '</tr>\n</table>';
