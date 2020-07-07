@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ModelForm
 from .models import Item, BigCategory, SmallCategory
 from django import forms
 
@@ -11,22 +10,16 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ("user_name",)
 
 
-class BigCategoryForm(ModelForm):
+class BigCategoryForm(forms.ModelForm):
     class Meta:
         model = BigCategory
         fields = ["big_category"]
 
 
-class SmallCategoryForm(ModelForm):
+class SmallCategoryForm(forms.ModelForm):
     class Meta:
         model = SmallCategory
         fields = ["big_category", "small_category"]
-
-
-class ItemForm(ModelForm):
-    class Meta:
-        model = Item
-        fields = ["item", "description", "small_category", "price", "paid_at"]
 
 
 class PostCreateForm(forms.ModelForm):

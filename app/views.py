@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .forms import (
     CustomUserCreationForm,
-    ItemForm,
     BigCategoryForm,
     SmallCategoryForm,
     PostCreateForm,
@@ -40,6 +39,7 @@ def signup(request):
 
 @login_required
 def big_category_new(request):
+    print(request.POST)
     if request.method == "POST":
         form = BigCategoryForm(request.POST)
         if form.is_valid():
@@ -59,6 +59,7 @@ def small_category_new(request):
         form = SmallCategoryForm(request.POST)
         if form.is_valid():
             category = form.save(commit=False)
+            category.save()
             messages.success(request, "投稿が完了しました！")
         return redirect("app:index")
     else:
