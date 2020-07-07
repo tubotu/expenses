@@ -1,0 +1,188 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{%block content%}
+
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <title>Chart.js</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'app/css/popup.css' %}">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+</head>
+
+<body>
+    <!--Creates the popup body-->
+    <div class="popup-overlay">
+        <!--Creates the popup content-->
+        <div class="popup-content">
+            <div id="wrap">
+            </div>
+            <!--popup's close button-->
+            <button class="close">Close</button>
+        </div>
+    </div>
+
+    <h1>検索条件</h1>
+
+    <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+        <table>
+            <tr>
+                <th>大カテゴリ</th>
+                <td>{{ form.big_category }}</td>
+                <th>小カテゴリ</th>
+                <td>{{ form.small_category }}</td>
+                <th><button type="submit" class="btn">検索</button></th>
+            </tr>
+        </table>
+    </form>
+
+    <h1>{{big_category.name}} - {{small_category.name}}</h1>
+
+    <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
+
+    <canvas id=outgoCanvas height="200px"></canvas>
+    <script type="text/javascript">
+
+        // グラフの中で参照できる形式に変換
+        var data_x = [];
+        {% for tmp in month_total %}
+        data_x.push("{{ tmp.month }}");
+        {% endfor %}
+        var data_y = [];
+        {% for tmp in month_total %}
+        data_y.push("{{ tmp.total }}");
+        {% endfor %}
+        // グラフの最大値を推定
+        var itemMax = Math.max.apply(null, data_y);
+        var index = Math.floor(Math.log10(itemMax));
+        itemMax = Math.ceil(itemMax / 10 ** index) * 10 ** index;
+        // グラフの描画
+        var drawGraph = function (x, y) {
+            var outgoCanvas = document.getElementById("outgoCanvas");
+            var ctx = outgoCanvas.getContext('2d');
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...data_x],
+                    datasets: [{
+                        label: "A",
+                        pointHitRadius: 15,
+                        data: [...data_y],
+                    },
+                    ]
+                },
+                options: {
+                    title: {
+                        display: false,
+                        text: 'グラフ'
+                    },
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                suggestedMax: itemMax,
+                                suggestedMin: 0, // 要改善
+                                stepSize: itemMax / 2, // 適当
+                                callback: function (value, index, values) {
+                                    return value // + '円'
+                                }
+                            }
+                        }]
+                    },
+                }
+            });
+            // グラフの点をクリックした際の処理を追加
+            outgoCanvas.onclick = function (e) {
+
+                var item = lineChart.getElementAtEvent(e);
+                if (!item.length) return; // return if not clicked on slice
+                var index = item[0]._index;
+
+                $(".popup-overlay, .popup-content").addClass("active");
+
+                $.ajax({
+                    url: '{% url "app:ajax_get_item" %}',
+                    type: 'GET',
+                    data: {
+                        'point_id': index,
+                    }
+                }).done(response => {
+                    var itemList = response.itemList
+                    // jQueryによるパターン
+                    $("#wrap").html("");
+                    target = $("#wrap")
+                    for (var n in itemList) {
+                        var text = '<table>\n<tr>\n';
+                        line = "<th>" + itemList[n].item + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td><td>" + itemList[n].price + "</td>";
+                        text = text + line + '</tr>\n</table>';
+                        $(target).append(text);
+                    }
+                });
+            }
+        };
+        window.onload = function () {
+            drawGraph("{{x.0}}", "{{y}}");
+        };
+    </script>
+    <table>
+        {% for tmp in month_total %}
+        <tr>
+            <th>{{tmp.month}}</th>
+            <td>{{tmp.total}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>
+{%endblock%}
+
+
+{% block extrajs %}
+<script>
+    const bigCategoryElement = $('#id_big_category');
+    const smallCategoryElement = $('#id_small_category');
+
+    const changeCategory = (select) => {
+        // 子カテゴリの選択欄を空にする。
+        smallCategoryElement.children().remove();
+
+        $.ajax({
+            url: "{% url 'app:ajax_get_category' %}",
+            type: 'GET',
+            data: {
+                'pk': bigCategoryElement.val(),
+            }
+        }).done(response => {
+            // 子カテゴリの選択肢を作成・追加
+            const option = $('<option>');
+            option.val("");
+            option.text("すべて");
+            smallCategoryElement.append(option);
+            for (const smallCategory of response.smallCategoryList) {
+                const option = $('<option>');
+                option.val(smallCategory['pk']);
+                option.text(smallCategory['name']);
+                smallCategoryElement.append(option);
+            }
+            // 指定があれば、そのカテゴリを選択する
+            if (select !== undefined) {
+                smallCategoryElement.val(select);
+            }
+        });
+    };
+    // 大カテゴリのオプション追加をここに書く
+    bigCategoryElement.on('change', () => {
+        changeCategory();
+    });
+    // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
+    if (bigCategoryElement.val()) {
+        const selectedCategory = smallCategoryElement.val();
+        changeCategory(selectedCategory);
+    }
+</script>
+{% endblock %}
