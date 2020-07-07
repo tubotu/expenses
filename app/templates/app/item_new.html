@@ -42,11 +42,11 @@
     <script>
         const bigCategoryElement = $('#id_big_category');
         const smallCategoryElement = $('#id_small_category');
-
+        // 初期化処理
+        smallCategoryElement.children().remove();
         const changeCategory = (select) => {
             // 子カテゴリの選択欄を空にする。
             smallCategoryElement.children().remove();
-
             $.ajax({
                 url: '{% url 'app:ajax_get_category' %}',
                 type: 'GET',
