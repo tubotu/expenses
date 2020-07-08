@@ -6,18 +6,13 @@
     <a href="{% url 'app:index' %}">ホームに戻る</a> 
 </div> 
 
-<form action="{% url 'app:category_new' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+<form action="{% url 'app:big_category_new' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
     <table>
         <tr>             
             <th>大カテゴリー</th>
             <td>{{ form.big_category }}</td>
         </tr>
     </table>
-    <button type="submit" class="btn">保存</button> 
-</form> 
- 
-<form action="{% url 'app:category_new2' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
-    {{ form.as_p }}
     <button type="submit" class="btn">保存</button> 
 </form> 
 {% endblock %}

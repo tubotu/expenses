@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_list_or_404, get_object_or_40
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .forms import (
-    CustomUserCreationForm,     
+    CustomUserCreationForm,
     BigCategoryForm,
     SmallCategoryForm,
     PostCreateForm,
@@ -36,10 +36,8 @@ def signup(request):
         form = CustomUserCreationForm()
     return render(request, "app/signup.html", {"form": form})
 
-
 @login_required
 def big_category_new(request):
-    print(request.POST)
     if request.method == "POST":
         form = BigCategoryForm(request.POST)
         if form.is_valid():
@@ -50,8 +48,7 @@ def big_category_new(request):
         return redirect("app:index")
     else:
         form = BigCategoryForm()
-    return render(request, "app/category_new.html", {"form": form})
-
+    return render(request, "app/big_category_new.html", {"form": form})
 
 @login_required
 def small_category_new(request):
@@ -64,7 +61,7 @@ def small_category_new(request):
         return redirect("app:index")
     else:
         form = SmallCategoryForm()
-    return render(request, "app/category_new2.html", {"form": form})
+    return render(request, "app/small_category_new.html", {"form": form})
 
 
 class PostCreate(generic.CreateView):
