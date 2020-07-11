@@ -1,5 +1,6 @@
 {% extends 'app/base.html' %}
 {% load static %}
+
 {%block content%}
 
 <!DOCTYPE html>
@@ -10,13 +11,16 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/css/popup.css' %}">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
+
     <!--Creates the popup body-->
     <div class="popup-overlay">
         <!--Creates the popup content-->
-        <div class="popup-content">
+        <div align="center" class="popup-content">
             <div id="wrap">
             </div>
             <!--popup's close button-->
@@ -24,7 +28,7 @@
         </div>
     </div>
 
-    <h1>検索条件</h1>
+    <h1 class="hoge text-primary">検索条件</h1>
 
     <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
         <table>
@@ -38,11 +42,11 @@
         </table>
     </form>
 
-    <h1>{{big_category.name}} - {{small_category.name}}</h1>
+    <h1 align="center">{{big_category.name}} - {{small_category.name}}</h1>
 
     <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
 
-    <canvas id=outgoCanvas height="200px"></canvas>
+    <canvas id=outgoCanvas height="200" width="400"></canvas>
     <script type="text/javascript">
 
         // グラフの中で参照できる形式に変換
@@ -62,14 +66,28 @@
         var drawGraph = function (x, y) {
             var outgoCanvas = document.getElementById("outgoCanvas");
             var ctx = outgoCanvas.getContext('2d');
+
+            Chart.defaults.global.defaultFontColor = 'black';
+            Chart.defaults.global.defaultFontSize = 18;
+            Chart.defaults.global.defaultFontStyle = "bold";
+            Chart.defaults.global.defaultFontFamily = "Arial";
+
             var lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: [...data_x],
                     datasets: [{
                         label: "A",
-                        pointHitRadius: 15,
                         data: [...data_y],
+
+                        backgroundColor: 'rgba(60, 160, 220, 0.1)',
+                        borderColor: 'rgba(60, 160, 220, 0.8)',
+                        lineTension: 0,
+
+                        pointRadius: 10,
+                        pointHitRadius: 15,
+                        pointBackgroundColor: 'rgba(60, 160, 220, 1)',
+                        pointBorderColor: 'rgba(60, 160, 220, 0.8)',
                     },
                     ]
                 },
@@ -82,16 +100,31 @@
                         display: false
                     },
                     scales: {
-                        yAxes: [{
-                            ticks: {
-                                suggestedMax: itemMax,
-                                suggestedMin: 0, // 要改善
-                                stepSize: itemMax / 2, // 適当
-                                callback: function (value, index, values) {
-                                    return value // + '円'
+                        xAxes: [
+                            {
+                                gridLines: {
+                                    color: 'rgba(251, 214, 58, 0.8)',
+                                    lineWidth: 4
                                 }
                             }
-                        }]
+                        ],
+                        yAxes: [
+                            {
+                                gridLines: {
+                                    color: 'rgba(251, 61, 49, 0.8)',
+                                    zeroLineColor: 'rgb(128, 0, 255)',
+                                    borderDash: [4, 1],
+                                },
+                                ticks: {
+                                    suggestedMax: itemMax + 1,
+                                    suggestedMin: 0, // 要改善
+                                    stepSize: itemMax / 2, // 適当
+                                    callback: function (value, index, values) {
+                                        return value // + '円'
+                                    }
+                                }
+                            }
+                        ],
                     },
                 }
             });
@@ -115,12 +148,14 @@
                     // jQueryによるパターン
                     $("#wrap").html("");
                     target = $("#wrap")
+                    var text = '<table class="table"><tr><th>日付</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
+                    var line = '';
+                    console.log(itemList)
                     for (var n in itemList) {
-                        var text = '<table>\n<tr>\n';
-                        line = "<th>" + itemList[n].item + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td><td>" + itemList[n].price + "</td>";
-                        text = text + line + '</tr>\n</table>';
-                        $(target).append(text);
+                        line = line + "<tr><th>" + itemList[n].item + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td><td>" + itemList[n].price + "</td></tr>";
                     }
+                    text = text + line + '</table>';
+                    $(target).append(text);
                 });
             }
         };
@@ -128,14 +163,26 @@
             drawGraph("{{x.0}}", "{{y}}");
         };
     </script>
-    <table>
-        {% for tmp in month_total %}
-        <tr>
-            <th>{{tmp.month}}</th>
-            <td>{{tmp.total}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+
+    <div class="table-wrapper-scroll-y my-custom-scrollbar">
+        <table class="table table-bordered table-striped mb-0">
+            <tr>
+                <th>日付</th>
+                <th>金額</th>
+            </tr>
+            {% for tmp in month_total %}
+            <tr>
+                <td>日付</td>
+                <td>金額</td>
+            </tr>
+            <tr>
+                <td>{{tmp.month}}</td>
+                <td>{{tmp.total}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 </body>
 
 </html>
