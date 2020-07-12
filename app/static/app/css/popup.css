@@ -5,8 +5,9 @@
     background: #ffffff;
     border: 3px solid #666666;
     width: 70%;
-    height: 20%;
+    height: 50%;
     left: 15%;
+    top: 20%;
     z-index: 3;
 }
 .popup-overlay.active {
@@ -37,18 +38,24 @@
     /*displays pop-up when "active" class is present*/
     visibility: visible;
 }
-button {
-    display: inline-block;
-    vertical-align: middle;
-    border-radius: 30px;
-    margin: .20rem;
-    font-size: 1rem;
+button.close {
+    position: absolute;
+    top:0px;
+    right:0px;
+    font-size: 2.0rem;
+    margin: .50rem;
     color: #666666;
     background: #ffffff;
-    border: 1px solid #666666;
+    border-radius: 30px;
 }
-button:hover {
+/*
+    display: inline-block;
+    vertical-align: middle;
     border: 1px solid #666666;
+
+*/
+button:hover {
     background: #666666;
     color: #ffffff;
 }
+border: 1px solid #666666;

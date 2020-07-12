@@ -1,6 +1,6 @@
 .my-custom-scrollbar {
     position: relative;
-    height: 200px;
+    height: 300px;
     overflow: auto;
 }
 
@@ -10,4 +10,16 @@
 
 .category-select-table {
     font-size: 28px;
+}
+#popup-date{
+    position: absolute;
+    height: 10%;
+    margin: .50rem;
+    text-align: center;
+}
+#popup-table{
+    position: absolute;
+    top: 10%;
+    height: 90%;
+    width: 100%;
 }

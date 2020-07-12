@@ -29,8 +29,9 @@
 <div class="popup-overlay">
     <!--Creates the popup content-->
     <div class="popup-content">
+        <div id="popup-date"></div>
+        <button class="close"> ✖ </button>
         <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar"></div>
-        <!--popup's close button <button class="close">Close</button> -->
     </div>
 </div>
 
@@ -145,7 +146,6 @@
             var item = lineChart.getElementAtEvent(e);
             if (!item.length) return; // return if not clicked on slice
             var index = item[0]._index;
-
             $(".popup-overlay, .popup-content, .popup-background").addClass("active");
 
             $.ajax({
@@ -157,12 +157,15 @@
             }).done(response => {
                 var itemList = response.itemList
                 // jQueryによるパターン
-                // $("#popup-table").empty();
+                $("#popup-date").html("");
+                target = $("#popup-date");
+                text = "<h2>" + item[0]._xScale.ticks[index] + "</h2>";
+                $(target).append(text);
+
                 $("#popup-table").html("");
                 target = $("#popup-table")
                 var text = '<table class="table"><tr><th>日付</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
                 var line = '';
-                console.log(itemList)
                 for (var n in itemList) {
                     line = line + "<tr><td>" + itemList[n].item + "</td><td>" + itemList[n].price + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td></tr>";
                 }
