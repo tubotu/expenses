@@ -1,0 +1,11 @@
+form {
+    transition: all 0.8s;
+    opacity: 0;
+    transform: translateX(-2.5%);
+    transition-timing-function : ease-out
+    /*animation: anim 5s forwards;*/
+}
+.fadein{
+    opacity: 1;
+    transform: translateX(0%);
+}

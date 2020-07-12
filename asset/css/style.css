@@ -1,6 +1,6 @@
 html, body {
     margin: 0;
-    }
+}
     div {
     box-sizing: border-box;
     }
@@ -9,9 +9,7 @@ html, body {
     color: #000;
     }
     .container {
-    width: 80%;
-    margin: auto;
-    overflow: auto;
+    width: 100%;
     }
     header {
     border-bottom: solid 1px #000;
@@ -22,7 +20,7 @@ html, body {
     justify-content: space-between;
     }
     body > .container {
-    width: 65%;
+    width: 100%;
     padding-top: 60px;
     }
     header h1 {
