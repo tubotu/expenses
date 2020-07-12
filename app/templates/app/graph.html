@@ -8,18 +8,20 @@
 
 {%block content%}
 <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
-    <table>
+    <table class="table category-select-table">
         <tr>
             <th>大カテゴリ</th>
             <td>{{ form.big_category }}</td>
             <th>小カテゴリ</th>
             <td>{{ form.small_category }}</td>
-            <th><button type="submit" class="btn">検索</button></th>
+        </tr>
+        <tr>
+            <!-- <th><button type="submit" class="btn">検索</button></th> -->
         </tr>
     </table>
 </form>
 
-<h1 align="center">{{big_category.name}} - {{small_category.name}}</h1>
+<!-- <h1 align="center">{{big_category.name}} - {{small_category.name}}</h1> -->
 
 <canvas id=outgoCanvas></canvas>
 

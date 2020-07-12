@@ -35,7 +35,7 @@
 }
 .popup-background.active {
     /*displays pop-up when "active" class is present*/
-    /* visibility: visible; */
+    visibility: visible;
 }
 button {
     display: inline-block;

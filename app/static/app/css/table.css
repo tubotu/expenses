@@ -7,3 +7,7 @@
 .table-wrapper-scroll-y {
     display: block;
 }
+
+.category-select-table {
+    font-size: 28px;
+}
