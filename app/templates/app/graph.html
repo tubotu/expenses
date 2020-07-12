@@ -7,17 +7,6 @@
 {% endblock %}
 
 {%block content%}
-<!--Creates the popup body-->
-<div class="popup-overlay">
-    <!--Creates the popup content-->
-    <div class="popup-content">
-        <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar">
-        </div>
-        <!--popup's close button-->
-        <button class="close">Close</button>
-    </div>
-</div>
-
 <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
     <table>
         <tr>
@@ -32,7 +21,41 @@
 
 <h1 align="center">{{big_category.name}} - {{small_category.name}}</h1>
 
-<canvas id=outgoCanvas height="200" width="400"></canvas>
+<canvas id=outgoCanvas></canvas>
+
+<!--Creates the popup body-->
+<div class="popup-overlay">
+    <!--Creates the popup content-->
+    <div class="popup-content">
+        <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar"></div>
+        <!--popup's close button <button class="close">Close</button> -->
+    </div>
+</div>
+
+<div class="popup-background"></div>
+
+<div class="table-wrapper-scroll-y my-custom-scrollbar">
+    <table class="table">
+        <tr>
+            <th>日付</th>
+            <th>金額</th>
+        </tr>
+        {% for tmp in month_total %}
+        <tr>
+            <td>{{tmp.month}}</td>
+            <td>{{tmp.total}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{%endblock%}
+
+
+{% block extrajs %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
 <script type="text/javascript">
     // グラフの中で参照できる形式に変換
     var data_x = [];
@@ -65,14 +88,14 @@
                     label: "A",
                     data: [...data_y],
 
-                    backgroundColor: 'rgba(60, 160, 220, 0.1)',
-                    borderColor: 'rgba(60, 160, 220, 0.8)',
+                    backgroundColor: 'rgba(110,121,92,0.1)',
+                    borderColor: 'rgba(110,121,92,1)',
                     lineTension: 0,
 
                     pointRadius: 10,
                     pointHitRadius: 15,
-                    pointBackgroundColor: 'rgba(60, 160, 220, 1)',
-                    pointBorderColor: 'rgba(60, 160, 220, 0.8)',
+                    pointBackgroundColor: 'rgba(110,121,92,1)',
+                    pointBorderColor: 'rgba(110,121,92,1)',
                 },
                 ]
             },
@@ -88,17 +111,18 @@
                     xAxes: [
                         {
                             gridLines: {
-                                color: 'rgba(251, 214, 58, 0.8)',
-                                lineWidth: 4
+                                color: 'rgba(166, 177, 147, 1)',
+                                lineWidth: 4,
+                                borderDash: [4, 1],
                             }
                         }
                     ],
                     yAxes: [
                         {
                             gridLines: {
-                                color: 'rgba(251, 61, 49, 0.8)',
-                                zeroLineColor: 'rgb(128, 0, 255)',
-                                borderDash: [4, 1],
+                                color: 'rgba(166, 177, 147, 1)',
+                                zeroLineColor: 'rgba(166, 177, 147, 1)',
+                                borderDash: [2, 1],
                             },
                             ticks: {
                                 suggestedMax: itemMax + 1,
@@ -120,7 +144,7 @@
             if (!item.length) return; // return if not clicked on slice
             var index = item[0]._index;
 
-            $(".popup-overlay, .popup-content").addClass("active");
+            $(".popup-overlay, .popup-content, .popup-background").addClass("active");
 
             $.ajax({
                 url: '{% url "app:ajax_get_item" %}',
@@ -149,34 +173,6 @@
         drawGraph("{{x.0}}", "{{y}}");
     };
 </script>
-
-<div class="table-wrapper-scroll-y my-custom-scrollbar">
-    <table class="table">
-        <tr>
-            <th>日付</th>
-            <th>金額</th>
-        </tr>
-        {% for tmp in month_total %}
-        <tr>
-            <td>日付</td>
-            <td>金額</td>
-        </tr>
-        <tr>
-            <td>{{tmp.month}}</td>
-            <td>{{tmp.total}}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-{%endblock%}
-
-
-{% block extrajs %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
-<script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
-
 <script>
     const bigCategoryElement = $('#id_big_category');
     const smallCategoryElement = $('#id_small_category');
