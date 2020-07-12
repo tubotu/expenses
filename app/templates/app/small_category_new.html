@@ -2,11 +2,14 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/slide.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/button.css' %}">
 
-<div>
-    <a href="{% url 'app:big_category_new' %}">大カテゴリーへ</a> 
-</div> 
- 
+<div class="flex">
+    <a href="{% url 'app:item_new' %}" class="button">アイテム登録</a>
+    <a href="{% url 'app:big_category_new'%}" class="button">大カテゴリー登録</a>
+    <a href="" class="button" id="now">小カテゴリー登録</a>
+</div>
+
 <form action="{% url 'app:small_category_new' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
     <table>
         <tr>             
