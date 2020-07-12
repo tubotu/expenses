@@ -1,195 +1,182 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/popup.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/table.css' %}">
+{% endblock %}
+
 {%block content%}
-
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <title>Chart.js</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'app/css/popup.css' %}">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-</head>
-
-<body>
-
-    <!--Creates the popup body-->
-    <div class="popup-overlay">
-        <!--Creates the popup content-->
-        <div align="center" class="popup-content">
-            <div id="wrap">
-            </div>
-            <!--popup's close button-->
-            <button class="close">Close</button>
+<!--Creates the popup body-->
+<div class="popup-overlay">
+    <!--Creates the popup content-->
+    <div class="popup-content">
+        <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar">
         </div>
+        <!--popup's close button-->
+        <button class="close">Close</button>
     </div>
+</div>
 
-    <h1 class="hoge text-primary">検索条件</h1>
+<form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <table>
+        <tr>
+            <th>大カテゴリ</th>
+            <td>{{ form.big_category }}</td>
+            <th>小カテゴリ</th>
+            <td>{{ form.small_category }}</td>
+            <th><button type="submit" class="btn">検索</button></th>
+        </tr>
+    </table>
+</form>
 
-    <form action="{% url 'app:graph' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
-        <table>
-            <tr>
-                <th>大カテゴリ</th>
-                <td>{{ form.big_category }}</td>
-                <th>小カテゴリ</th>
-                <td>{{ form.small_category }}</td>
-                <th><button type="submit" class="btn">検索</button></th>
-            </tr>
-        </table>
-    </form>
+<h1 align="center">{{big_category.name}} - {{small_category.name}}</h1>
 
-    <h1 align="center">{{big_category.name}} - {{small_category.name}}</h1>
+<canvas id=outgoCanvas height="200" width="400"></canvas>
+<script type="text/javascript">
+    // グラフの中で参照できる形式に変換
+    var data_x = [];
+    {% for tmp in month_total %}
+    data_x.push("{{ tmp.month }}");
+    {% endfor %}
+    var data_y = [];
+    {% for tmp in month_total %}
+    data_y.push("{{ tmp.total }}");
+    {% endfor %}
+    // グラフの最大値を推定
+    var itemMax = Math.max.apply(null, data_y);
+    var index = Math.floor(Math.log10(itemMax));
+    itemMax = Math.ceil(itemMax / 10 ** index) * 10 ** index;
+    // グラフの描画
+    var drawGraph = function (x, y) {
+        var outgoCanvas = document.getElementById("outgoCanvas");
+        var ctx = outgoCanvas.getContext('2d');
 
-    <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
+        Chart.defaults.global.defaultFontColor = 'black';
+        Chart.defaults.global.defaultFontSize = 18;
+        Chart.defaults.global.defaultFontStyle = "bold";
+        Chart.defaults.global.defaultFontFamily = "Arial";
 
-    <canvas id=outgoCanvas height="200" width="400"></canvas>
-    <script type="text/javascript">
+        var lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [...data_x],
+                datasets: [{
+                    label: "A",
+                    data: [...data_y],
 
-        // グラフの中で参照できる形式に変換
-        var data_x = [];
-        {% for tmp in month_total %}
-        data_x.push("{{ tmp.month }}");
-        {% endfor %}
-        var data_y = [];
-        {% for tmp in month_total %}
-        data_y.push("{{ tmp.total }}");
-        {% endfor %}
-        // グラフの最大値を推定
-        var itemMax = Math.max.apply(null, data_y);
-        var index = Math.floor(Math.log10(itemMax));
-        itemMax = Math.ceil(itemMax / 10 ** index) * 10 ** index;
-        // グラフの描画
-        var drawGraph = function (x, y) {
-            var outgoCanvas = document.getElementById("outgoCanvas");
-            var ctx = outgoCanvas.getContext('2d');
+                    backgroundColor: 'rgba(60, 160, 220, 0.1)',
+                    borderColor: 'rgba(60, 160, 220, 0.8)',
+                    lineTension: 0,
 
-            Chart.defaults.global.defaultFontColor = 'black';
-            Chart.defaults.global.defaultFontSize = 18;
-            Chart.defaults.global.defaultFontStyle = "bold";
-            Chart.defaults.global.defaultFontFamily = "Arial";
-
-            var lineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [...data_x],
-                    datasets: [{
-                        label: "A",
-                        data: [...data_y],
-
-                        backgroundColor: 'rgba(60, 160, 220, 0.1)',
-                        borderColor: 'rgba(60, 160, 220, 0.8)',
-                        lineTension: 0,
-
-                        pointRadius: 10,
-                        pointHitRadius: 15,
-                        pointBackgroundColor: 'rgba(60, 160, 220, 1)',
-                        pointBorderColor: 'rgba(60, 160, 220, 0.8)',
-                    },
-                    ]
+                    pointRadius: 10,
+                    pointHitRadius: 15,
+                    pointBackgroundColor: 'rgba(60, 160, 220, 1)',
+                    pointBorderColor: 'rgba(60, 160, 220, 0.8)',
                 },
-                options: {
-                    title: {
-                        display: false,
-                        text: 'グラフ'
-                    },
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [
-                            {
-                                gridLines: {
-                                    color: 'rgba(251, 214, 58, 0.8)',
-                                    lineWidth: 4
+                ]
+            },
+            options: {
+                title: {
+                    display: false,
+                    text: 'グラフ'
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [
+                        {
+                            gridLines: {
+                                color: 'rgba(251, 214, 58, 0.8)',
+                                lineWidth: 4
+                            }
+                        }
+                    ],
+                    yAxes: [
+                        {
+                            gridLines: {
+                                color: 'rgba(251, 61, 49, 0.8)',
+                                zeroLineColor: 'rgb(128, 0, 255)',
+                                borderDash: [4, 1],
+                            },
+                            ticks: {
+                                suggestedMax: itemMax + 1,
+                                suggestedMin: 0, // 要改善
+                                stepSize: itemMax / 2, // 適当
+                                callback: function (value, index, values) {
+                                    return value // + '円'
                                 }
                             }
-                        ],
-                        yAxes: [
-                            {
-                                gridLines: {
-                                    color: 'rgba(251, 61, 49, 0.8)',
-                                    zeroLineColor: 'rgb(128, 0, 255)',
-                                    borderDash: [4, 1],
-                                },
-                                ticks: {
-                                    suggestedMax: itemMax + 1,
-                                    suggestedMin: 0, // 要改善
-                                    stepSize: itemMax / 2, // 適当
-                                    callback: function (value, index, values) {
-                                        return value // + '円'
-                                    }
-                                }
-                            }
-                        ],
-                    },
-                }
-            });
-            // グラフの点をクリックした際の処理を追加
-            outgoCanvas.onclick = function (e) {
-
-                var item = lineChart.getElementAtEvent(e);
-                if (!item.length) return; // return if not clicked on slice
-                var index = item[0]._index;
-
-                $(".popup-overlay, .popup-content").addClass("active");
-
-                $.ajax({
-                    url: '{% url "app:ajax_get_item" %}',
-                    type: 'GET',
-                    data: {
-                        'point_id': index,
-                    }
-                }).done(response => {
-                    var itemList = response.itemList
-                    // jQueryによるパターン
-                    $("#wrap").html("");
-                    target = $("#wrap")
-                    var text = '<table class="table"><tr><th>日付</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
-                    var line = '';
-                    console.log(itemList)
-                    for (var n in itemList) {
-                        line = line + "<tr><th>" + itemList[n].item + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td><td>" + itemList[n].price + "</td></tr>";
-                    }
-                    text = text + line + '</table>';
-                    $(target).append(text);
-                });
+                        }
+                    ],
+                },
             }
-        };
-        window.onload = function () {
-            drawGraph("{{x.0}}", "{{y}}");
-        };
-    </script>
+        });
+        // グラフの点をクリックした際の処理を追加
+        outgoCanvas.onclick = function (e) {
 
-    <div class="table-wrapper-scroll-y my-custom-scrollbar">
-        <table class="table table-bordered table-striped mb-0">
-            <tr>
-                <th>日付</th>
-                <th>金額</th>
-            </tr>
-            {% for tmp in month_total %}
-            <tr>
-                <td>日付</td>
-                <td>金額</td>
-            </tr>
-            <tr>
-                <td>{{tmp.month}}</td>
-                <td>{{tmp.total}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+            var item = lineChart.getElementAtEvent(e);
+            if (!item.length) return; // return if not clicked on slice
+            var index = item[0]._index;
 
-</body>
+            $(".popup-overlay, .popup-content").addClass("active");
 
-</html>
+            $.ajax({
+                url: '{% url "app:ajax_get_item" %}',
+                type: 'GET',
+                data: {
+                    'point_id': index,
+                }
+            }).done(response => {
+                var itemList = response.itemList
+                // jQueryによるパターン
+                // $("#popup-table").empty();
+                $("#popup-table").html("");
+                target = $("#popup-table")
+                var text = '<table class="table"><tr><th>日付</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
+                var line = '';
+                console.log(itemList)
+                for (var n in itemList) {
+                    line = line + "<tr><td>" + itemList[n].item + "</td><td>" + itemList[n].price + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td></tr>";
+                }
+                text = text + line + '</table>';
+                $(target).append(text);
+            });
+        }
+    };
+    window.onload = function () {
+        drawGraph("{{x.0}}", "{{y}}");
+    };
+</script>
+
+<div class="table-wrapper-scroll-y my-custom-scrollbar">
+    <table class="table">
+        <tr>
+            <th>日付</th>
+            <th>金額</th>
+        </tr>
+        {% for tmp in month_total %}
+        <tr>
+            <td>日付</td>
+            <td>金額</td>
+        </tr>
+        <tr>
+            <td>{{tmp.month}}</td>
+            <td>{{tmp.total}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 {%endblock%}
 
 
 {% block extrajs %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
+
 <script>
     const bigCategoryElement = $('#id_big_category');
     const smallCategoryElement = $('#id_small_category');
