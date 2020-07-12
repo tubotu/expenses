@@ -1,5 +1,5 @@
 form {
-    transition: all 0.8s;
+    transition: all 0.5s;
     opacity: 0;
     transform: translateX(-2.5%);
     transition-timing-function : ease-out
