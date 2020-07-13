@@ -18,5 +18,6 @@ urlpatterns = [
     path("item/new/", login_required(views.PostCreate.as_view()), name="item_new"),
     path("graph/", login_required(views.Graph.as_view()), name="graph"),
     path("api/category/get/", views.ajax_get_category, name="ajax_get_category"),
-    path("api/item/get", views.ajax_get_item, name="ajax_get_item"),  # URLは何でもいい
+    path("api/item/get", views.ajax_get_item, name="ajax_get_item"),
+    path("api/graph/get", views.ajax_get_graph, name="ajax_get_graph"),
 ]

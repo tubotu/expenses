@@ -59,16 +59,7 @@
 <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
 <script type="text/javascript">
 
-    var drawGraph = function (x, y) {
-        // グラフの中で参照できる形式に変換
-        var data_x = [];
-        {% for tmp in month_total %}
-        data_x.push("{{ tmp.month }}");
-        {% endfor %}
-        var data_y = [];
-        {% for tmp in month_total %}
-        data_y.push("{{ tmp.total }}");
-        {% endfor %}
+    var drawGraph = function (data_x, data_y) {
         // グラフの最大値を推定
         var itemMax = Math.max.apply(null, data_y);
         var index = Math.floor(Math.log10(itemMax));
@@ -173,19 +164,38 @@
             });
         }
     };
-    drawGraph();
-    /* 多分不要
-    window.onload = function () {
-        drawGraph("{{x.0}}", "{{y}}");
-    };
-    */
+
+    // Djangoから渡された値を，グラフの中で参照できる形式に変換
+    var x = [];
+    var y = [];
+    {% for tmp in month_total %}
+    x.push("{{ tmp.month }}");
+    y.push("{{ tmp.total }}");
+    {% endfor %}
+
+    drawGraph(x, y);
+
     // カテゴリ更新に合わせてグラフを更新 
-    document.getElementById('btn').onclick = function () {
-        if (lineChart) {
-            lineChart.destroy();
-        }
-        drawGraph();
-    }
+    const changeGraph = (select) => {
+        if (lineChart) { lineChart.destroy(); }
+        $.ajax({
+            url: "{% url 'app:ajax_get_graph' %}",
+            type: 'GET',
+            data: {
+                'big_category_selected': bigCategoryElement.val(),
+                'small_category_selected': smallCategoryElement.val(),
+            }
+        }).done(response => {
+            //response
+            var x = [];
+            var y = [];
+            for (const tmp of response.month_total) {
+                x.push(tmp.month);
+                y.push(tmp.total);
+            }
+            drawGraph(x, y);
+        });
+    };
 
     const bigCategoryElement = $('#id_big_category');
     const smallCategoryElement = $('#id_small_category');
@@ -221,11 +231,20 @@
     // 大カテゴリのオプション追加をここに書く
     bigCategoryElement.on('change', () => {
         changeCategory();
+        changeGraph();
+    });
+    smallCategoryElement.on('change', () => {
+        changeGraph();
     });
     // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
     if (bigCategoryElement.val()) {
         const selectedCategory = smallCategoryElement.val();
         changeCategory(selectedCategory);
     }
+    /* 多分不要
+    window.onload = function () {
+        drawGraph("{{x.0}}", "{{y}}");
+    };
+    */
 </script>
 {% endblock %}

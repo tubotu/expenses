@@ -206,6 +206,59 @@ class Graph(generic.ListView):
         return context
 
 
+def ajax_get_graph(request):
+    # 変更されたカテゴリに対して絞込み
+    small_category_selected = request.GET.get("small_category_selected")
+    big_category_selected = request.GET.get("big_category_selected")
+    user_id = request.user.id
+    print(small_category_selected)
+    print(big_category_selected)
+    items = Item.objects.filter(small_category__big_category__user_id=user_id)
+    print(items)
+    if big_category_selected:
+        items = items.filter(small_category__big_category=big_category_selected)
+    print(items)
+    if small_category_selected:
+        items = items.filter(small_category=small_category_selected)
+    print(items)
+    print("!!!")
+    # グラフの描画に必要な情報の計算
+    paid_at = [item.paid_at for item in items]
+    price = [item.price for item in items]
+    xy = zip(paid_at, price, items)
+    xy = sorted(xy, key=itemgetter(0))
+    # x軸, y軸
+    x = []
+    y = []
+    list_item = []
+
+    for key, group in groupby(xy, itemgetter(0)):
+        x.append(key)
+        sum_price = 0
+        tmp_item = []
+        for item in list(group):
+            sum_price += item[1]
+            tmp_item.append(item[2].id)
+        y.append(sum_price)
+        list_item.append(tmp_item)
+    x = [tmp.strftime("%m-%d") for tmp in x]  # datetimeから文字列へと変換
+    # セッションにitem_idを記録
+    point_id = list(range(len(x)))
+    print(request.session["item_id"])
+    request.session["item_id"] = {}
+    for id_ in point_id:
+        if "item_id" in request.session:
+            request.session["item_id"][str(id_)] = list_item[id_]
+        else:
+            request.session["item_id"] = {str(id_): list_item[id_]}
+    # 絞り込んだアイテムから，横軸と縦軸を計算
+    month_total = []
+    for month, total in zip(x, y):
+        month_total.append({"month": month, "total": total})
+
+    return JsonResponse({"month_total": month_total})
+
+
 def ajax_get_item(request):
     # グラフのクリックした点に合わせて関連するアイテムを表示
     point_id = request.GET.get("point_id")
