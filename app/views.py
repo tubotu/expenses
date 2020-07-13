@@ -36,6 +36,7 @@ def signup(request):
         form = CustomUserCreationForm()
     return render(request, "app/signup.html", {"form": form})
 
+
 @login_required
 def big_category_new(request):
     if request.method == "POST":
@@ -49,6 +50,7 @@ def big_category_new(request):
     else:
         form = BigCategoryForm()
     return render(request, "app/big_category_new.html", {"form": form})
+
 
 @login_required
 def small_category_new(request):
@@ -104,7 +106,7 @@ class Graph(generic.ListView):
     model = Item
     success_url = "/"
     template_name = "app/graph.html"
-
+    """
     def post(self, request, *args, **kwargs):
         # 検索ボタンを押した後の処理
         form_value = [
@@ -114,16 +116,17 @@ class Graph(generic.ListView):
         request.session["form_value"] = form_value
 
         return self.get(request, *args, **kwargs)
-
+    
     def get_queryset(self):
         # itemをすべて表示
         user_id = self.request.user.id
 
         return Item.objects.filter(small_category__big_category__user_id=user_id)
+    """
 
     def get_context_data(self, **kwargs):
         # formとグラフの描画に必要な情報をページに送信する
-        context = super().get_context_data(**kwargs)
+        """
         # postの処理（小カテゴリだけを選択して送信されると困るなぁ）
         if "form_value" in self.request.session:
             form_value = self.request.session["form_value"]
@@ -133,13 +136,8 @@ class Graph(generic.ListView):
             big_category = ""
             small_category = ""
 
-        context["form"] = GraphForm(
-            user_id=self.request.user.id, cat=small_category
-        )  # catは削除を検討中
         # postに合わせてアイテムを削減，カテゴリの表示名を取得（すべてのカテゴリ対応を改善したい）
         # contextに選択したカテゴリ名を含めるかどうかは要検討
-        user_id = self.request.user.id
-        items = Item.objects.filter(small_category__big_category__user_id=user_id)
         if big_category:
             items = items.filter(small_category__big_category=big_category)
             tmp_query = BigCategory.objects.filter(pk=big_category)
@@ -166,12 +164,18 @@ class Graph(generic.ListView):
                 "name": "すべて",
                 "pk": "",
             }
+        """
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.user.id
+        context["form"] = GraphForm(user_id=self.request.user.id)
+
+        items = Item.objects.filter(small_category__big_category__user_id=user_id)
         # グラフの描画に必要な情報の計算
         paid_at = [item.paid_at for item in items]
         price = [item.price for item in items]
         xy = zip(paid_at, price, items)
         xy = sorted(xy, key=itemgetter(0))
-
+        # x軸, y軸
         x = []
         y = []
         list_item = []
@@ -184,19 +188,16 @@ class Graph(generic.ListView):
                 tmp_item.append(item[2].id)
             y.append(sum_price)
             list_item.append(tmp_item)
-
+        x = [tmp.strftime("%m-%d") for tmp in x]  # datetimeから文字列へと変換
+        # セッションにitem_idを記録
         point_id = list(range(len(x)))
-
         self.request.session["item_id"] = {}
-
         for id_ in point_id:
             if "item_id" in self.request.session:
                 self.request.session["item_id"][str(id_)] = list_item[id_]
             else:
                 self.request.session["item_id"] = {str(id_): list_item[id_]}
-
-        x = [tmp.strftime("%m-%d") for tmp in x]
-
+        # 絞り込んだアイテムから，横軸と縦軸を計算
         month_total = []
         for month, total in zip(x, y):
             month_total.append({"month": month, "total": total})

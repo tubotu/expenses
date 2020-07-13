@@ -59,7 +59,7 @@ class GraphForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         user_id = kwargs.pop("user_id")
-        cat = kwargs.pop("cat")  # 現時点では不要
+        # cat = kwargs.pop("cat")  # 現時点では不要
         super().__init__(*args, **kwargs)  # popより後，selfより前に置かないとエラーになる
         # user_idを元に，big_categoryの表示内容を絞り込み
         tmp = [
