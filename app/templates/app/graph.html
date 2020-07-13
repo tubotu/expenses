@@ -35,19 +35,23 @@
 
 <div class="popup-background"></div>
 
+<h2>表</h2>
+
 <div class="table-wrapper-scroll-y my-custom-scrollbar">
-    <table class="table">
-        <tr>
-            <th>日付</th>
-            <th>金額</th>
-        </tr>
-        {% for tmp in month_total %}
-        <tr>
-            <td>{{tmp.month}}</td>
-            <td>{{tmp.total}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div id="graph-table">
+        <table class="table">
+            <tr>
+                <th>日付</th>
+                <th>金額</th>
+            </tr>
+            {% for tmp in month_total %}
+            <tr>
+                <td>{{tmp.month}}</td>
+                <td>{{tmp.total}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
 {%endblock%}
@@ -186,14 +190,28 @@
                 'small_category_selected': smallCategoryElement.val(),
             }
         }).done(response => {
-            //response
+            // グラフを更新
             var x = [];
             var y = [];
-            for (const tmp of response.month_total) {
+            var month_total = response.month_total
+            for (const tmp of month_total) {
+                console.log(tmp)
                 x.push(tmp.month);
                 y.push(tmp.total);
             }
             drawGraph(x, y);
+            // テーブルを更新
+            $("#graph-table").html("");
+            target = $("#graph-table");
+            text = "<table class='table'>\n<tr>\n<th>日付</th>\n<th>金額</th>\n</tr>\n";
+            var line = '';
+            for (const tmp of month_total) {
+                console.log(tmp)
+                line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "</td>\n</tr>\n";
+            }
+            text = text + line + "</table>";
+            console.log(text)
+            $(target).append(text);
         });
     };
 
