@@ -1,0 +1,27 @@
+.flex{
+    display: flex; /*横並びにする*/
+    padding: 10px;
+}
+.flex a{
+    width: 100%;
+}
+.flex .button{
+    font-size: 18pt;        /* 文字サイズ */
+    border-radius : 4%;          /* 角丸       */
+    text-align: center;      /* 文字位置   */
+    cursor: pointer;     /* カーソル   */
+    background: #3ba108;     /* 背景色     */
+    color: #ffffff;     /* 文字色     */
+    line-height: 2em;         /* 1行の高さ  */
+    transition: .3s;         /* なめらか変化 */
+    border: 2px solid #073a00;    /* 枠の指定 */
+}
+.flex #now{
+    position: relative;
+    background : #215f02;     /* 背景色     */
+    bottom: -2px;
+}
+.button:hover {
+  color: #3ba108;     /* 背景色     */
+  background: #ffffff;     /* 文字色     */
+}
