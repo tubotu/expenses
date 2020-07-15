@@ -140,10 +140,10 @@ def items_to_xy(request, items):
     return month_total
 
 
-class Graph(generic.ListView):
+class MonthlyGraph(generic.ListView):
     model = Item
     success_url = "/"
-    template_name = "app/graph.html"
+    template_name = "app/monthly_graph.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
