@@ -104,7 +104,7 @@ def ajax_get_category(request):
 
 def items_to_xy(request, items):
     # グラフの描画に必要な情報の計算
-    paid_at = [item.paid_at for item in items]
+    paid_at = [item.paid_at.month for item in items]
     price = [item.price for item in items]
     xy = zip(paid_at, price, items)
     xy = sorted(xy, key=itemgetter(0))
@@ -114,6 +114,7 @@ def items_to_xy(request, items):
     list_item = []
     for key, group in groupby(xy, itemgetter(0)):
         x.append(key)
+
         sum_price = 0
         tmp_item = []
         for item in list(group):
@@ -121,10 +122,10 @@ def items_to_xy(request, items):
             tmp_item.append(item[2].id)
         y.append(sum_price)
         list_item.append(tmp_item)
-    x = [tmp.strftime("%m-%d") for tmp in x]  # datetimeから文字列へと変換
+    x = [str(tmp) + "月" for tmp in x]  # datetimeから文字列へと変換
     # セッションにitem_idを記録
     point_id = list(range(len(x)))
-    print(request.session["item_id"])
+
     request.session["item_id"] = {}
     for id_ in point_id:
         if "item_id" in request.session:
