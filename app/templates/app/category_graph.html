@@ -6,6 +6,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/table.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/slide.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/button.css' %}">
+
+<!-- Bootstrap-datepicker -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css"
+    rel="stylesheet" type="text/css">
 {% endblock %}
 
 {%block content%}
@@ -14,14 +18,17 @@
     <a href="" class="button" id="now">カテゴリ</a>
 </div>
 <!--カテゴリ選択を行うフォーム-->
-<table class="table category-select-table">
-    <tr>
-        <th>大カテゴリ</th>
-        <td>{{ form.big_category }}</td>
-        <th>小カテゴリ</th>
-        <td>{{ form.small_category }}</td>
-    </tr>
-</table>
+<div class="form-group" id="datepicker-startview">
+    <label class="col-sm-3 control-label">Start view</label>
+    <div class="col-sm-9 form-inline">
+        <div class="input-group date">
+            <input type="text" class="form-control">
+            <span class="input-group-addon">
+                <i class="glyphicon glyphicon-th"></i>
+            </span>
+        </div>
+    </div>
+</div>
 
 <canvas id=outgoCanvas></canvas>
 
@@ -60,7 +67,22 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
 <script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
+<!-- Bootstrap-datepicker -->
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ja.min.js"></script>
 <script type="text/javascript">
+
+    $(function () {
+        $('#datepicker-startview .date').datepicker({
+            startView: 1,
+            language: "ja",
+            format: 'yyyy/mm',
+            autoclose: true,
+            minViewMode: 'months',
+        });
+    });
 
     var drawGraph = function (data_x, data_y) {
         // グラフの最大値を推定
@@ -169,11 +191,10 @@
     const changeGraph = (select) => {
         if (lineChart) { lineChart.destroy(); }
         $.ajax({
-            url: "{% url 'app:ajax_get_graph' %}",
+            url: "{% url 'app:ajax_get_category_graph' %}",
             type: 'GET',
             data: {
-                'big_category_selected': bigCategoryElement.val(),
-                'small_category_selected': smallCategoryElement.val(),
+                'date_selected': dateElement.val(),
             }
         }).done(response => {
             // グラフを更新
@@ -181,7 +202,6 @@
             var y = [];
             var month_total = response.month_total
             for (const tmp of month_total) {
-                console.log(tmp)
                 x.push(tmp.month);
                 y.push(tmp.total);
             }
@@ -192,57 +212,18 @@
             text = "<table class='table'>\n<tr>\n<th>日付</th>\n<th>金額</th>\n</tr>\n";
             var line = '';
             for (const tmp of month_total) {
-                console.log(tmp)
                 line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "</td>\n</tr>\n";
             }
             text = text + line + "</table>";
-            console.log(text)
             $(target).append(text);
         });
     };
-
-    const bigCategoryElement = $('#id_big_category');
-    const smallCategoryElement = $('#id_small_category');
-    // 大カテゴリの選択に合わせて，小カテゴリの内容を変更
-    const changeCategory = (select) => {
-        smallCategoryElement.children().remove();
-        $.ajax({
-            url: "{% url 'app:ajax_get_category' %}",
-            type: 'GET',
-            data: {
-                'pk': bigCategoryElement.val(),
-            }
-        }).done(response => {
-            // 小カテゴリの選択肢を作成・追加
-            const option = $('<option>');
-            option.val("");
-            option.text("すべて");
-            smallCategoryElement.append(option);
-            for (const smallCategory of response.smallCategoryList) {
-                const option = $('<option>');
-                option.val(smallCategory['pk']);
-                option.text(smallCategory['name']);
-                smallCategoryElement.append(option);
-            }
-            // 指定があれば、そのカテゴリを選択する
-            if (select !== undefined) {
-                smallCategoryElement.val(select);
-            }
-        });
-    };
+    const dateElement = $('.form-control');
     // カテゴリ選択に合わせて実行する処理
-    bigCategoryElement.on('change', () => {
-        changeCategory();
+    dateElement.on('change', () => {
+        console.log(dateElement.val())
         changeGraph();
     });
-    smallCategoryElement.on('change', () => {
-        changeGraph();
-    });
-    // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
-    if (bigCategoryElement.val()) {
-        const selectedCategory = smallCategoryElement.val();
-        changeCategory(selectedCategory);
-    }
     // init
     var x = [];
     var y = [];

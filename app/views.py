@@ -15,6 +15,7 @@ from .models import Item, BigCategory, SmallCategory
 
 from itertools import groupby
 from operator import itemgetter
+import datetime
 
 
 def index(request):
@@ -156,14 +157,16 @@ class MonthlyGraph(generic.ListView):
         return context
 
 
-def category_based_aggregation(request, items):
-    items = [item for item in items if item.paid_at.month == 5]
+def category_based_aggregation(request, items, date):
+
+    items = [item for item in items if item.paid_at.month == date]
+    print(items)
     # グラフの描画に必要な情報の計算
     big_category = [str(item.small_category.big_category) for item in items]
     price = [item.price for item in items]
     xy = zip(big_category, price, items)
     xy = sorted(xy, key=itemgetter(0))
-    print(xy)
+
     x = []
     y = []
     list_item = []
@@ -205,10 +208,25 @@ class CategoryGraph(generic.ListView):
         context["form"] = GraphForm(user_id=self.request.user.id)
         items = Item.objects.filter(small_category__big_category__user_id=user_id)
 
-        month_total = category_based_aggregation(self.request, items)
+        month_total = category_based_aggregation(
+            self.request, items, datetime.datetime.now().month
+        )
         context["month_total"] = month_total
 
         return context
+
+
+def ajax_get_category_graph(request):
+    # 変更された日付に対して絞込み
+    date_selected = request.GET.get("date_selected")
+    date_selected = datetime.datetime.strptime(date_selected, "%Y/%m")
+    print(date_selected.month)
+    user_id = request.user.id
+    items = Item.objects.filter(small_category__big_category__user_id=user_id)
+
+    month_total = category_based_aggregation(request, items, date_selected.month)
+
+    return JsonResponse({"month_total": month_total})
 
 
 def ajax_get_graph(request):
