@@ -21,6 +21,11 @@ urlpatterns = [
         login_required(views.MonthlyGraph.as_view()),
         name="monthly_graph",
     ),
+    path(
+        "category_graph/",
+        login_required(views.CategoryGraph.as_view()),
+        name="category_graph",
+    ),
     path("api/category/get/", views.ajax_get_category, name="ajax_get_category"),
     path("api/item/get", views.ajax_get_item, name="ajax_get_item"),
     path("api/graph/get", views.ajax_get_graph, name="ajax_get_graph"),

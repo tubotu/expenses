@@ -114,7 +114,6 @@ def items_to_xy(request, items):
     list_item = []
     for key, group in groupby(xy, itemgetter(0)):
         x.append(key)
-
         sum_price = 0
         tmp_item = []
         for item in list(group):
@@ -152,6 +151,61 @@ class MonthlyGraph(generic.ListView):
         items = Item.objects.filter(small_category__big_category__user_id=user_id)
 
         month_total = items_to_xy(self.request, items)
+        context["month_total"] = month_total
+
+        return context
+
+
+def category_based_aggregation(request, items):
+    items = [item for item in items if item.paid_at.month == 5]
+    # グラフの描画に必要な情報の計算
+    big_category = [str(item.small_category.big_category) for item in items]
+    price = [item.price for item in items]
+    xy = zip(big_category, price, items)
+    xy = sorted(xy, key=itemgetter(0))
+    print(xy)
+    x = []
+    y = []
+    list_item = []
+    for key, group in groupby(xy, itemgetter(0)):
+        x.append(key)
+        sum_price = 0
+        tmp_item = []
+        for item in list(group):
+            sum_price += item[1]
+            tmp_item.append(item[2].id)
+        y.append(sum_price)
+        list_item.append(tmp_item)
+    x = [str(tmp) for tmp in x]  # datetimeから文字列へと変換
+    # セッションにitem_idを記録
+    point_id = list(range(len(x)))
+
+    request.session["item_id"] = {}
+    for id_ in point_id:
+        if "item_id" in request.session:
+            request.session["item_id"][str(id_)] = list_item[id_]
+        else:
+            request.session["item_id"] = {str(id_): list_item[id_]}
+    # 絞り込んだアイテムから，横軸と縦軸を計算
+    month_total = []
+    for month, total in zip(x, y):
+        month_total.append({"month": month, "total": total})
+
+    return month_total
+
+
+class CategoryGraph(generic.ListView):
+    model = Item
+    success_url = "/"
+    template_name = "app/category_graph.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.user.id
+        context["form"] = GraphForm(user_id=self.request.user.id)
+        items = Item.objects.filter(small_category__big_category__user_id=user_id)
+
+        month_total = category_based_aggregation(self.request, items)
         context["month_total"] = month_total
 
         return context
