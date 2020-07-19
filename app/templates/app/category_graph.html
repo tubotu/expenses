@@ -1,0 +1,82 @@
+{% extends 'app/base_graph.html' %}
+{% load static %}
+
+{% block other_head %}
+<!-- Bootstrap-datepicker -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css"
+    rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block graph %}
+<!--グラフの切り替え-->
+<div class="flex">
+    <a href="{% url 'app:monthly_graph'%}" class="button">日付</a>
+    <a href="" class="button" id="now">カテゴリ</a>
+</div>
+
+<!--年月選択を行うフォーム-->
+<div class="form-group" id="datepicker-startview">
+    <table class="table category-select-table">
+        <tr>
+            <th>年月</th>
+            <!-- <label class="col-sm-3 control-label">Start view</label> -->
+            <td>
+                <div class="col-sm-9 form-inline">
+                    <div class="input-group date">
+                        <input type="text" class="form-control">
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-th"></i>
+                        </span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
+
+{% block otherjs %}
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ja.min.js"></script>
+<script type="text/javascript">
+    // init
+    const dateElement = $('.form-control');
+    var x = [];
+    var y = [];
+    {% for tmp in month_total %}
+    x.push("{{ tmp.month }}");
+    y.push("{{ tmp.total }}");
+    {% endfor %}
+    drawGraph(x, y, type_chart = "bar");
+    // カテゴリ選択に合わせてグラフを更新 
+    const changeGraph = (select) => {
+        if (mainChart) { mainChart.destroy(); }
+        $.ajax({
+            url: "{% url 'app:ajax_get_category_graph' %}",
+            type: 'GET',
+            data: {
+                'date_selected': dateElement.val(),
+            }
+        }).done(response => {
+            reflectChanges(response, "bar")
+        });
+    };
+    // カテゴリ選択に合わせて実行する処理
+    dateElement.on('change', () => {
+        console.log(dateElement.val())
+        changeGraph();
+    });
+    // 年月選択のフォームに関する設定
+    $(function () {
+        $('#datepicker-startview .date').datepicker({
+            startView: 1,
+            language: "ja",
+            format: 'yyyy/mm',
+            autoclose: true,
+            minViewMode: 'months',
+        });
+    });
+</script>
+{% endblock %}

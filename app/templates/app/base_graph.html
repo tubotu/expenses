@@ -1,0 +1,66 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/popup.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/table.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/slide.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/button.css' %}">
+
+{% block other_head %}
+{% endblock %}
+
+{% endblock %}
+
+
+{% block content %}
+
+{% block graph %}
+{% endblock %}
+
+<canvas id=outgoCanvas></canvas>
+
+<!--ポップアップ-->
+<div class="popup-overlay">
+    <div class="popup-content">
+        <div id="popup-date"></div>
+        <button class="close"> ✖ </button>
+        <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar"></div>
+    </div>
+</div>
+<div class="popup-background"></div>
+
+<!--表-->
+<h2>表</h2>
+<div class="table-wrapper-scroll-y my-custom-scrollbar">
+    <div id="graph-table">
+        <table class="table">
+            <tr>
+                <th>日付</th>
+                <th>金額</th>
+            </tr>
+            {% for tmp in month_total %}
+            <tr>
+                <td>{{tmp.month}}</td>
+                <td>{{tmp.total}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extrajs %}
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script type="text/javascript" src="{% static 'app/js/popup.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/js/graph.js' %}"></script>
+
+{% block otherjs %}
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'app/base_graph.html' %}
+{% load static %}
+
+{% block graph %}
+<!--グラフの切り替え-->
+<div class="flex">
+    <a href="" class="button" id="now">日付</a>
+    <a href="{% url 'app:category_graph'%}" class="button">カテゴリ</a>
+</div>
+
+<!--カテゴリ選択を行うフォーム-->
+<table class="table category-select-table">
+    <tr>
+        <th>大カテゴリ</th>
+        <td>{{ form.big_category }}</td>
+        <th>小カテゴリ</th>
+        <td>{{ form.small_category }}</td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block otherjs %}
+<script type="text/javascript">
+    // init
+    const bigCategoryElement = $('#id_big_category');
+    const smallCategoryElement = $('#id_small_category');
+    var x = [];
+    var y = [];
+    {% for tmp in month_total %}
+    x.push("{{ tmp.month }}");
+    y.push("{{ tmp.total }}");
+    {% endfor %}
+    drawGraph(x, y, type_chart = "line");
+    // カテゴリ選択に合わせてグラフを更新 
+    const changeGraph = (select) => {
+        if (mainChart) { mainChart.destroy(); }
+        $.ajax({
+            url: "{% url 'app:ajax_get_monthly_graph' %}",
+            type: 'GET',
+            data: {
+                'big_category_selected': bigCategoryElement.val(),
+                'small_category_selected': smallCategoryElement.val(),
+            }
+        }).done(response => {
+            reflectChanges(response, "line")
+        });
+    };
+    // 大カテゴリの選択に合わせて，小カテゴリの内容を変更
+    const changeCategory = (select) => {
+        smallCategoryElement.children().remove();
+        $.ajax({
+            url: "{% url 'app:ajax_get_category' %}",
+            type: 'GET',
+            data: {
+                'pk': bigCategoryElement.val(),
+            }
+        }).done(response => {
+            // 小カテゴリの選択肢を作成・追加
+            const option = $('<option>');
+            option.val("");
+            option.text("すべて");
+            smallCategoryElement.append(option);
+            for (const smallCategory of response.smallCategoryList) {
+                const option = $('<option>');
+                option.val(smallCategory['pk']);
+                option.text(smallCategory['name']);
+                smallCategoryElement.append(option);
+            }
+            // 指定があれば、そのカテゴリを選択する
+            if (select !== undefined) {
+                smallCategoryElement.val(select);
+            }
+        });
+    };
+    // カテゴリ選択に合わせて実行する処理
+    bigCategoryElement.on('change', () => {
+        changeCategory();
+        changeGraph();
+    });
+    smallCategoryElement.on('change', () => {
+        changeGraph();
+    });
+    // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
+    if (bigCategoryElement.val()) {
+        const selectedCategory = smallCategoryElement.val();
+        changeCategory(selectedCategory);
+    }
+</script>
+{% endblock %}

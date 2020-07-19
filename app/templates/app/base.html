@@ -17,7 +17,7 @@
         <div class="container">
             <h1><a href="{% url 'app:index' %}">ゴリゴリカテゴリー</a></h1>
             <div class="header-menu">
-                <a href="{% url 'app:graph' %}">グラフ</a>
+                <a href="{% url 'app:monthly_graph' %}">グラフ</a>
                 <a href="{% url 'app:item_new' %}">投稿</a>
                 {% if request.user.is_authenticated %}
                 <a href="{% url 'app:logout' %}">ログアウト</a>
