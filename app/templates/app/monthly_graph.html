@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block graph %}
+<!--グラフの切り替え-->
 <div class="flex">
     <a href="" class="button" id="now">日付</a>
     <a href="{% url 'app:category_graph'%}" class="button">カテゴリ</a>
@@ -20,9 +21,19 @@
 
 {% block otherjs %}
 <script type="text/javascript">
+    // init
+    const bigCategoryElement = $('#id_big_category');
+    const smallCategoryElement = $('#id_small_category');
+    var x = [];
+    var y = [];
+    {% for tmp in month_total %}
+    x.push("{{ tmp.month }}");
+    y.push("{{ tmp.total }}");
+    {% endfor %}
+    drawGraph(x, y, type_chart = "line");
     // カテゴリ選択に合わせてグラフを更新 
     const changeGraph = (select) => {
-        if (lineChart) { lineChart.destroy(); }
+        if (mainChart) { mainChart.destroy(); }
         $.ajax({
             url: "{% url 'app:ajax_get_graph' %}",
             type: 'GET',
@@ -31,33 +42,9 @@
                 'small_category_selected': smallCategoryElement.val(),
             }
         }).done(response => {
-            // グラフを更新
-            var x = [];
-            var y = [];
-            var month_total = response.month_total
-            for (const tmp of month_total) {
-                console.log(tmp)
-                x.push(tmp.month);
-                y.push(tmp.total);
-            }
-            drawGraph(x, y, type_chart = "line");
-            // テーブルを更新
-            $("#graph-table").html("");
-            target = $("#graph-table");
-            text = "<table class='table'>\n<tr>\n<th>日付</th>\n<th>金額</th>\n</tr>\n";
-            var line = '';
-            for (const tmp of month_total) {
-                console.log(tmp)
-                line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "</td>\n</tr>\n";
-            }
-            text = text + line + "</table>";
-            console.log(text)
-            $(target).append(text);
+            reflectChanges(response, "line")
         });
     };
-
-    const bigCategoryElement = $('#id_big_category');
-    const smallCategoryElement = $('#id_small_category');
     // 大カテゴリの選択に合わせて，小カテゴリの内容を変更
     const changeCategory = (select) => {
         smallCategoryElement.children().remove();
@@ -98,13 +85,5 @@
         const selectedCategory = smallCategoryElement.val();
         changeCategory(selectedCategory);
     }
-    // init
-    var x = [];
-    var y = [];
-    {% for tmp in month_total %}
-    x.push("{{ tmp.month }}");
-    y.push("{{ tmp.total }}");
-    {% endfor %}
-    drawGraph(x, y, type_chart = "line");
 </script>
 {% endblock %}

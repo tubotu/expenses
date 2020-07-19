@@ -12,7 +12,7 @@ var drawGraph = function (data_x, data_y, type_chart) {
     Chart.defaults.global.defaultFontStyle = "bold";
     Chart.defaults.global.defaultFontFamily = "Arial";
 
-    window.lineChart = new Chart(ctx, {
+    window.mainChart = new Chart(ctx, {
         type: type_chart,
         data: {
             labels: [...data_x],
@@ -71,7 +71,7 @@ var drawGraph = function (data_x, data_y, type_chart) {
     });
     // グラフの点をクリックした際の処理を追加
     outgoCanvas.onclick = function (e) {
-        var item = lineChart.getElementAtEvent(e);
+        var item = mainChart.getElementAtEvent(e);
         if (!item.length) return; // return if not clicked on slice
         var index = item[0]._index;
         $(".popup-overlay, .popup-content, .popup-background").addClass("active");
@@ -100,4 +100,26 @@ var drawGraph = function (data_x, data_y, type_chart) {
             $(target).append(text);
         });
     }
+};
+
+var reflectChanges = function (ajax_response, type_chart) {
+    // グラフを更新
+    var x = [];
+    var y = [];
+    var month_total = ajax_response.month_total
+    for (const tmp of month_total) {
+        x.push(tmp.month);
+        y.push(tmp.total);
+    }
+    drawGraph(x, y, type_chart = type_chart);
+    // テーブルを更新
+    $("#graph-table").html("");
+    target = $("#graph-table");
+    text = "<table class='table'>\n<tr>\n<th>日付</th>\n<th>金額</th>\n</tr>\n";
+    var line = '';
+    for (const tmp of month_total) {
+        line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "</td>\n</tr>\n";
+    }
+    text = text + line + "</table>";
+    $(target).append(text);
 };
