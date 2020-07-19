@@ -35,7 +35,7 @@
     const changeGraph = (select) => {
         if (mainChart) { mainChart.destroy(); }
         $.ajax({
-            url: "{% url 'app:ajax_get_graph' %}",
+            url: "{% url 'app:ajax_get_monthly_graph' %}",
             type: 'GET',
             data: {
                 'big_category_selected': bigCategoryElement.val(),

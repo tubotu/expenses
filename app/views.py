@@ -103,43 +103,6 @@ def ajax_get_category(request):
     return JsonResponse({"smallCategoryList": small_category_list})
 
 
-def items_to_xy(request, items):
-    # グラフの描画に必要な情報の計算
-    paid_at = [item.paid_at.month for item in items]
-    price = [item.price for item in items]
-    xy = zip(paid_at, price, items)
-    xy = sorted(xy, key=itemgetter(0))
-    # x軸, y軸
-    x = []
-    y = []
-    list_item = []
-    for key, group in groupby(xy, itemgetter(0)):
-        x.append(key)
-        sum_price = 0
-        tmp_item = []
-        for item in list(group):
-            sum_price += item[1]
-            tmp_item.append(item[2].id)
-        y.append(sum_price)
-        list_item.append(tmp_item)
-    x = [str(tmp) + "月" for tmp in x]  # datetimeから文字列へと変換
-    # セッションにitem_idを記録
-    point_id = list(range(len(x)))
-
-    request.session["item_id"] = {}
-    for id_ in point_id:
-        if "item_id" in request.session:
-            request.session["item_id"][str(id_)] = list_item[id_]
-        else:
-            request.session["item_id"] = {str(id_): list_item[id_]}
-    # 絞り込んだアイテムから，横軸と縦軸を計算
-    month_total = []
-    for month, total in zip(x, y):
-        month_total.append({"month": month, "total": total})
-
-    return month_total
-
-
 class MonthlyGraph(generic.ListView):
     model = Item
     success_url = "/"
@@ -150,52 +113,39 @@ class MonthlyGraph(generic.ListView):
         user_id = self.request.user.id
         context["form"] = GraphForm(user_id=self.request.user.id)
         items = Item.objects.filter(small_category__big_category__user_id=user_id)
-
-        month_total = items_to_xy(self.request, items)
+        month_total = date_based_aggregation(self.request, items)
         context["month_total"] = month_total
-
 
         return context
 
 
-def category_based_aggregation(request, items, date):
-
-    items = [item for item in items if item.paid_at.month == date]
-
-    # グラフの描画に必要な情報の計算
-    big_category = [str(item.small_category.big_category) for item in items]
+def date_based_aggregation(request, items):
+    paid_at = [item.paid_at.month for item in items]
     price = [item.price for item in items]
-    xy = zip(big_category, price, items)
-    xy = sorted(xy, key=itemgetter(0))
+    xy = zip(paid_at, price, items)
 
-    x = []
-    y = []
-    list_item = []
-    for key, group in groupby(xy, itemgetter(0)):
-        x.append(key)
-        sum_price = 0
-        tmp_item = []
-        for item in list(group):
-            sum_price += item[1]
-            tmp_item.append(item[2].id)
-        y.append(sum_price)
-        list_item.append(tmp_item)
-    x = [str(tmp) for tmp in x]  # datetimeから文字列へと変換
-    # セッションにitem_idを記録
-    point_id = list(range(len(x)))
-
-    request.session["item_id"] = {}
-    for id_ in point_id:
-        if "item_id" in request.session:
-            request.session["item_id"][str(id_)] = list_item[id_]
-        else:
-            request.session["item_id"] = {str(id_): list_item[id_]}
-    # 絞り込んだアイテムから，横軸と縦軸を計算
-    month_total = []
-    for month, total in zip(x, y):
-        month_total.append({"month": month, "total": total})
+    month_total = items_to_graph(request, xy)
+    print(month_total)
+    for tmp in month_total:
+        tmp["month"] = str(tmp["month"]) + "月"
 
     return month_total
+
+
+def ajax_get_monthly_graph(request):
+    # 変更されたカテゴリに対して絞込み
+    small_category_selected = request.GET.get("small_category_selected")
+    big_category_selected = request.GET.get("big_category_selected")
+    user_id = request.user.id
+    items = Item.objects.filter(small_category__big_category__user_id=user_id)
+    if big_category_selected:
+        items = items.filter(small_category__big_category=big_category_selected)
+    if small_category_selected:
+        items = items.filter(small_category=small_category_selected)
+
+    month_total = date_based_aggregation(request, items)
+
+    return JsonResponse({"month_total": month_total})
 
 
 class CategoryGraph(generic.ListView):
@@ -208,7 +158,6 @@ class CategoryGraph(generic.ListView):
         user_id = self.request.user.id
         context["form"] = GraphForm(user_id=self.request.user.id)
         items = Item.objects.filter(small_category__big_category__user_id=user_id)
-
         month_total = category_based_aggregation(
             self.request, items, datetime.datetime.now().month
         )
@@ -217,11 +166,23 @@ class CategoryGraph(generic.ListView):
         return context
 
 
+def category_based_aggregation(request, items, date):
+
+    items = [item for item in items if item.paid_at.month == date]
+    big_category = [str(item.small_category.big_category) for item in items]
+    price = [item.price for item in items]
+    xy = zip(big_category, price, items)
+
+    month_total = items_to_graph(request, xy)
+
+    return month_total
+
+
 def ajax_get_category_graph(request):
     # 変更された日付に対して絞込み
     date_selected = request.GET.get("date_selected")
     date_selected = datetime.datetime.strptime(date_selected, "%Y/%m")
-    print(date_selected.month)
+
     user_id = request.user.id
     items = Item.objects.filter(small_category__big_category__user_id=user_id)
 
@@ -230,20 +191,35 @@ def ajax_get_category_graph(request):
     return JsonResponse({"month_total": month_total})
 
 
-def ajax_get_graph(request):
-    # 変更されたカテゴリに対して絞込み
-    small_category_selected = request.GET.get("small_category_selected")
-    big_category_selected = request.GET.get("big_category_selected")
-    user_id = request.user.id
-    items = Item.objects.filter(small_category__big_category__user_id=user_id)
-    if big_category_selected:
-        items = items.filter(small_category__big_category=big_category_selected)
-    if small_category_selected:
-        items = items.filter(small_category=small_category_selected)
+def items_to_graph(request, xy):
+    # グラフの描画に必要な情報の計算
+    xy = sorted(xy, key=itemgetter(0))
+    x = []
+    y = []
+    list_item = []
+    for key, group in groupby(xy, itemgetter(0)):
+        x.append(key)
+        sum_price = 0
+        tmp_item = []
+        for item in list(group):
+            sum_price += item[1]
+            tmp_item.append(item[2].id)
+        y.append(sum_price)
+        list_item.append(tmp_item)
+    # セッションにitem_idを記録
+    point_id = list(range(len(x)))
+    request.session["item_id"] = {}
+    for id_ in point_id:
+        if "item_id" in request.session:
+            request.session["item_id"][str(id_)] = list_item[id_]
+        else:
+            request.session["item_id"] = {str(id_): list_item[id_]}
+    # htmlで利用しやすい形に変換
+    month_total = []
+    for month, total in zip(x, y):
+        month_total.append({"month": month, "total": total})
 
-    month_total = items_to_xy(request, items)
-
-    return JsonResponse({"month_total": month_total})
+    return month_total
 
 
 def ajax_get_item(request):

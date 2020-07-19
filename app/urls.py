@@ -28,7 +28,11 @@ urlpatterns = [
     ),
     path("api/category/get/", views.ajax_get_category, name="ajax_get_category"),
     path("api/item/get", views.ajax_get_item, name="ajax_get_item"),
-    path("api/graph/get", views.ajax_get_graph, name="ajax_get_graph"),
+    path(
+        "api/monthly_graph/get",
+        views.ajax_get_monthly_graph,
+        name="ajax_get_monthly_graph",
+    ),
     path(
         "api/category_graph/get",
         views.ajax_get_category_graph,
