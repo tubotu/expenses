@@ -154,13 +154,14 @@ class MonthlyGraph(generic.ListView):
         month_total = items_to_xy(self.request, items)
         context["month_total"] = month_total
 
+
         return context
 
 
 def category_based_aggregation(request, items, date):
 
     items = [item for item in items if item.paid_at.month == date]
-    print(items)
+
     # グラフの描画に必要な情報の計算
     big_category = [str(item.small_category.big_category) for item in items]
     price = [item.price for item in items]
