@@ -156,12 +156,12 @@ class CategoryGraph(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_id = self.request.user.id
+        this_month = datetime.datetime.now().month
         context["form"] = GraphForm(user_id=self.request.user.id)
         items = Item.objects.filter(small_category__big_category__user_id=user_id)
-        month_total = category_based_aggregation(
-            self.request, items, datetime.datetime.now().month
-        )
+        month_total = category_based_aggregation(self.request, items, this_month)
         context["month_total"] = month_total
+        context["this_month"] = this_month
 
         return context
 

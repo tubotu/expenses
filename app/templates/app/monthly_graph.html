@@ -60,11 +60,13 @@
             option.val("");
             option.text("すべて");
             smallCategoryElement.append(option);
-            for (const smallCategory of response.smallCategoryList) {
-                const option = $('<option>');
-                option.val(smallCategory['pk']);
-                option.text(smallCategory['name']);
-                smallCategoryElement.append(option);
+            if (bigCategoryElement.val() != "") {
+                for (const smallCategory of response.smallCategoryList) {
+                    const option = $('<option>');
+                    option.val(smallCategory['pk']);
+                    option.text(smallCategory['name']);
+                    smallCategoryElement.append(option);
+                }
             }
             // 指定があれば、そのカテゴリを選択する
             if (select !== undefined) {

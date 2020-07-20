@@ -8,9 +8,9 @@ var drawGraph = function (data_x, data_y, type_chart) {
     var ctx = outgoCanvas.getContext('2d');
 
     Chart.defaults.global.defaultFontColor = 'black';
-    Chart.defaults.global.defaultFontSize = 18;
-    Chart.defaults.global.defaultFontStyle = "bold";
-    Chart.defaults.global.defaultFontFamily = "Arial";
+    Chart.defaults.global.defaultFontSize = 28;
+    // Chart.defaults.global.defaultFontStyle = "bold";
+    // Chart.defaults.global.defaultFontFamily = "Arial";
 
     window.mainChart = new Chart(ctx, {
         type: type_chart,
@@ -46,6 +46,9 @@ var drawGraph = function (data_x, data_y, type_chart) {
                             color: 'rgba(166, 177, 147, 1)',
                             lineWidth: 4,
                             borderDash: [4, 1],
+                        },
+                        ticks: {
+                            padding: 20,
                         }
                     }
                 ],
@@ -57,11 +60,12 @@ var drawGraph = function (data_x, data_y, type_chart) {
                             borderDash: [2, 1],
                         },
                         ticks: {
+                            padding: 20,
                             suggestedMax: itemMax + 1,
                             suggestedMin: 0, // 要改善
                             stepSize: itemMax / 2, // 適当
                             callback: function (value, index, values) {
-                                return value // + '円'
+                                return value + '円'
                             }
                         }
                     }
@@ -91,7 +95,7 @@ var drawGraph = function (data_x, data_y, type_chart) {
 
             $("#popup-table").html("");
             target = $("#popup-table")
-            var text = '<table class="table"><tr><th>日付</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
+            var text = '<table class="table"><tr><th>項目</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
             var line = '';
             for (var n in itemList) {
                 line = line + "<tr><td>" + itemList[n].item + "</td><td>" + itemList[n].price + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td></tr>";
@@ -115,10 +119,10 @@ var reflectChanges = function (ajax_response, type_chart) {
     // テーブルを更新
     $("#graph-table").html("");
     target = $("#graph-table");
-    text = "<table class='table'>\n<tr>\n<th>日付</th>\n<th>金額</th>\n</tr>\n";
+    text = "<table class='table'>";
     var line = '';
     for (const tmp of month_total) {
-        line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "</td>\n</tr>\n";
+        line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "円</td>\n</tr>\n";
     }
     text = text + line + "</table>";
     $(target).append(text);
