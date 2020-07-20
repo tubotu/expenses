@@ -1,4 +1,31 @@
 {% extends 'app/base.html' %}
+{% load static %}
 {% block content %}
-    Djamazon トップページ
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/top.css' %}">
+    <div class='explain'>
+    <br>
+    <center><h2>
+    ゴリゴリカテゴリーにようこそ！<br>
+    大カテゴリーと小カテゴリーの二段階で支出を管理します。
+    </center></h2>
+    <hr>
+    <h2>使い方</h2>
+    1.右上のサインアップからユーザー名とパスワードを登録してください。(パスワードは絶対に他のサイトから流用しないでください。)
+    <br>
+    2.右上の投稿から大カテゴリー名と小カテゴリー名を登録してください。
+    <br>
+    3.右上の投稿からアイテムを登録します。
+    <br>
+    4.右上のグラフから大カテゴリーと小カテゴリーごとの支出を見ることができます。
+    <br>
+    ・日付モード
+    <br>
+    <span class="tab">月ごとの支出を折れ線グラフで見ることができます。</span>
+    <br>
+    <center><img src="static/app/img/explain2.PNG"  width="300" height="300"></center>
+    ・カテゴリーモード<br>
+    <span class="tab"> 月を選択することでカテゴリー別支出の棒グラフで見ることができます。</span>
+    <br>
+    <center><img src="static/app/img/explain2.PNG"  width="300" height="300"></center>
+    </div>
 {% endblock %}
