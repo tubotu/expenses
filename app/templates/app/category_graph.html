@@ -13,7 +13,6 @@
     <a href="{% url 'app:monthly_graph'%}" class="button">日付</a>
     <a href="" class="button" id="now">カテゴリ</a>
 </div>
-
 <!--年月選択を行うフォーム-->
 <div class="form-group" id="datepicker-startview">
     <table class="table category-select-table">
@@ -77,6 +76,8 @@
             autoclose: true,
             minViewMode: 'months',
         });
+        $('#datepicker-startview .date').datepicker().datepicker("setDate", "2020/" + "{{this_month}}");
     });
+
 </script>
 {% endblock %}

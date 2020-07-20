@@ -32,18 +32,13 @@
 <div class="popup-background"></div>
 
 <!--表-->
-<h2>表</h2>
 <div class="table-wrapper-scroll-y my-custom-scrollbar">
     <div id="graph-table">
         <table class="table">
-            <tr>
-                <th>日付</th>
-                <th>金額</th>
-            </tr>
             {% for tmp in month_total %}
             <tr>
                 <td>{{tmp.month}}</td>
-                <td>{{tmp.total}}</td>
+                <td>{{tmp.total}}円</td>
             </tr>
             {% endfor %}
         </table>
