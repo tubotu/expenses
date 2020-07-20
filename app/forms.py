@@ -33,9 +33,6 @@ class PostCreateForm(forms.ModelForm):
         self.fields["big_category"].queryset = BigCategory.objects.filter(
             user_id=user_ids
         )
-        self.fields["small_category"].queryset = BigCategory.objects.filter(
-            user_id=user_ids
-        )
 
     class Meta:
         model = Item

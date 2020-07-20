@@ -21,7 +21,6 @@ class SmallCategory(models.Model):
 
 class Item(models.Model):
     item = models.CharField(max_length=30)     
-    description = models.TextField(blank=True)
     small_category = models.ForeignKey(SmallCategory
         , on_delete=models.CASCADE # userを消したら消えるようにしたい,small_categoryだけ消すときは移植作業が必要
     )
