@@ -125,7 +125,7 @@ def date_based_aggregation(request, items):
     xy = zip(paid_at, price, items)
 
     month_total = items_to_graph(request, xy)
-    print(month_total)
+
     for tmp in month_total:
         tmp["month"] = str(tmp["month"]) + "月"
 
