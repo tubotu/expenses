@@ -47,7 +47,7 @@ def big_category_new(request):
             category.user = request.user
             category.save()
             messages.success(request, "投稿が完了しました！")
-        return redirect("app:index")
+        return redirect("app:big_category_new")
     else:
         form = BigCategoryForm()
     return render(request, "app/big_category_new.html", {"form": form})
@@ -61,7 +61,7 @@ def small_category_new(request):
             category = form.save(commit=False)
             category.save()
             messages.success(request, "投稿が完了しました！")
-        return redirect("app:index")
+        return redirect("app:small_category_new")
     else:
         form = SmallCategoryForm()
     return render(request, "app/small_category_new.html", {"form": form})
@@ -70,7 +70,7 @@ def small_category_new(request):
 class PostCreate(generic.CreateView):
     model = Item
     form_class = PostCreateForm
-    success_url = "/"
+    success_url = "/item/new"
     template_name = "app/item_new.html"
 
     def form_valid(self, form):
