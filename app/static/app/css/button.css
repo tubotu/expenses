@@ -6,7 +6,7 @@
     width: 100%;
 }
 .flex .button{
-    font-size: 18pt;        /* 文字サイズ */
+    font-size: 1.0rem;        /* 文字サイズ */
     border-radius : 4%;          /* 角丸       */
     text-align: center;      /* 文字位置   */
     cursor: pointer;     /* カーソル   */

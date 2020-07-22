@@ -24,8 +24,8 @@
     // init
     const bigCategoryElement = $('#id_big_category');
     const smallCategoryElement = $('#id_small_category');
-    var x = [];
-    var y = [];
+    const x = [];
+    const y = [];
     {% for tmp in month_total %}
     x.push("{{ tmp.month }}");
     y.push("{{ tmp.total }}");

@@ -1,47 +1,31 @@
-{% extends 'app/base.html' %} 
+{% extends 'app/base.html' %}
 {% load static %}
-{% block content %}
+
+{% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/slide.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'app/css/button.css' %}">
+{% endblock %}
 
+{% block content %}
 <div class="flex">
-<a href="{% url 'app:item_new' %}" class="button">アイテム登録</a>
-<a href="" class="button" id="now">大カテゴリー登録</a>
-<a href="{% url 'app:small_category_new' %}" class="button">小カテゴリー登録</a>
+    <a href="{% url 'app:item_new' %}" class="button">アイテム登録</a>
+    <a href="" class="button" id="now">大カテゴリー登録</a>
+    <a href="{% url 'app:small_category_new' %}" class="button">小カテゴリー登録</a>
 </div>
-<form action="{% url 'app:big_category_new' %}" method="POST" enctype="multipart/form-data" class="is-slide" id="page-animate">
+<form action="{% url 'app:big_category_new' %}" method="POST" enctype="multipart/form-data" class="is-slide"
+    id="page-animate">
     {% csrf_token %}
     <table>
-        <tr>             
+        <tr>
             <th>大カテゴリー</th>
             <td>{{ form.big_category }}</td>
         </tr>
     </table>
-    <button type="submit" class="btn">保存</button> 
-</form> 
+    <button type="submit" class="btn">保存</button>
+</form>
 {% endblock %}
 
 
 {% block extrajs %}
-<script>
-    // 画面が読み込まれた時、fade-inクラスを追加しアニメーションさせる
-    $(window).on('load', function(){
-    $('form').addClass('fadein');
-    });
-
-    $(function() {
-        // ハッシュリンク(#)と別ウィンドウでページを開く場合は実行しない
-        $('a:not([href^="#"]):not([target])').on('click', function(e){
-            e.preventDefault();         // ページ遷移を一旦キャンセル
-            url = $(this).attr('href'); // 遷移先のURLを取得
-            if (url !== '') {
-                $('form').removeClass('fadein'); // 画面遷移前のアニメーション
-                setTimeout(function () {
-                    window.location = url;  // 0.5秒後に取得したURLに遷移
-                }, 500);
-            }
-            return false;
-        });
-    });
-</script>
+<script type="text/javascript" src="{% static 'app/js/fadein.js' %}"></script>
 {% endblock %}
