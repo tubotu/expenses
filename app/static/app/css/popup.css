@@ -24,6 +24,12 @@
 .popup-content {
     visibility: hidden;
 }
+#popup-date{
+    position: absolute;
+    height: 10%;
+    margin: .50rem;
+    text-align: center;
+}
 /*displays pop-up when "active" class is present*/
 .popup-background.active {
     visibility: visible;

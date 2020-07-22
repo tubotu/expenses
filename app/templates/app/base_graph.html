@@ -30,20 +30,16 @@
         <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar"></div>
     </div>
 </div>
-
-
 <!--表-->
-<div class="table-wrapper-scroll-y my-custom-scrollbar">
-    <div id="graph-table">
-        <table class="table">
-            {% for tmp in month_total %}
-            <tr>
-                <td>{{tmp.month}}</td>
-                <td>{{tmp.total}}円</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+<div id="graph-table" class="table-wrapper-scroll-y my-custom-scrollbar">
+    <table class="table">
+        {% for tmp in month_total %}
+        <tr>
+            <td>{{tmp.month}}</td>
+            <td>{{tmp.total}}円</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 
 {% endblock %}
