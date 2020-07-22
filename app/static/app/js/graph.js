@@ -7,9 +7,11 @@ var drawGraph = function (data_x, data_y, type_chart) {
     var outgoCanvas = document.getElementById("outgoCanvas");
     var ctx = outgoCanvas.getContext('2d');
 
+    var current_font_size = Number($('.flex').css('font-size').replace(/[^0-9]/g, ''));
+    console.log(current_font_size)
     Chart.defaults.global.defaultFontColor = 'black';
-    Chart.defaults.global.defaultFontSize = 28;
-    // Chart.defaults.global.defaultFontStyle = "bold";
+    Chart.defaults.global.defaultFontSize = current_font_size;
+    Chart.defaults.global.defaultFontStyle = "bold";
     // Chart.defaults.global.defaultFontFamily = "Arial";
 
     window.mainChart = new Chart(ctx, {
