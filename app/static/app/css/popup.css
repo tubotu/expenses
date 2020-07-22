@@ -27,7 +27,7 @@
 #popup-date{
     position: absolute;
     height: 10%;
-    margin: .50rem;
+    margin: .25rem;
     text-align: center;
 }
 /*displays pop-up when "active" class is present*/
@@ -45,7 +45,7 @@ button.close {
     position: absolute;
     top:0px;
     right:0px;
-    margin: .50rem;
+    margin: .25rem;
     font-size: 2.0rem;
 }
 button:hover {

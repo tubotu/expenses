@@ -42,8 +42,8 @@
 <script type="text/javascript">
     // init
     const dateElement = $('#date-form');
-    var x = [];
-    var y = [];
+    const x = [];
+    const y = [];
     {% for tmp in month_total %}
     x.push("{{ tmp.month }}");
     y.push("{{ tmp.total }}");
@@ -64,7 +64,6 @@
     };
     // カテゴリ選択に合わせて実行する処理
     dateElement.on('change', () => {
-        console.log(dateElement.val())
         changeGraph();
     });
     // 年月選択のフォームに関する設定
@@ -78,6 +77,5 @@
         });
         $('#datepicker-startview .date').datepicker().datepicker("setDate", "2020/" + "{{this_month}}");
     });
-
 </script>
 {% endblock %}

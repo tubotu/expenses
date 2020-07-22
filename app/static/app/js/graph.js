@@ -1,14 +1,13 @@
-var drawGraph = function (data_x, data_y, type_chart) {
+const drawGraph = function (data_x, data_y, type_chart) {
     // グラフの最大値を推定
-    var itemMax = Math.max.apply(null, data_y);
-    var index = Math.floor(Math.log10(itemMax));
+    let itemMax = Math.max.apply(null, data_y);
+    const index = Math.floor(Math.log10(itemMax));
     itemMax = Math.ceil(itemMax / 10 ** index) * 10 ** index;
     // グラフの描画
-    var outgoCanvas = document.getElementById("outgoCanvas");
-    var ctx = outgoCanvas.getContext('2d');
+    const outgoCanvas = document.getElementById("outgoCanvas");
+    const ctx = outgoCanvas.getContext('2d');
 
-    var current_font_size = Number($('.flex').css('font-size').replace(/[^0-9]/g, ''));
-    console.log(current_font_size)
+    const current_font_size = Number($('.flex').css('font-size').replace(/[^0-9]/g, ''));
     Chart.defaults.global.defaultFontColor = 'black';
     Chart.defaults.global.defaultFontSize = current_font_size;
     Chart.defaults.global.defaultFontStyle = "bold";
@@ -77,9 +76,9 @@ var drawGraph = function (data_x, data_y, type_chart) {
     });
     // グラフの点をクリックした際の処理を追加
     outgoCanvas.onclick = function (e) {
-        var item = mainChart.getElementAtEvent(e);
+        const item = mainChart.getElementAtEvent(e);
         if (!item.length) return; // return if not clicked on slice
-        var index = item[0]._index;
+        const index = item[0]._index;
         $(".popup-overlay, .popup-content, .popup-background").addClass("active");
         $.ajax({
             url: '/api/item/get',
@@ -88,7 +87,7 @@ var drawGraph = function (data_x, data_y, type_chart) {
                 'point_id': index,
             }
         }).done(response => {
-            var itemList = response.itemList
+            const itemList = response.itemList
             // jQueryによるパターン
             $("#popup-date").html("");
             target = $("#popup-date");
@@ -99,7 +98,7 @@ var drawGraph = function (data_x, data_y, type_chart) {
             target = $("#popup-table")
             var text = '<table class="table"><tr><th>項目</th><th>金額</th><th>大カテゴリ</th><th>小カテゴリ</th></tr>';
             var line = '';
-            for (var n in itemList) {
+            for (const n in itemList) {
                 line = line + "<tr><td>" + itemList[n].item + "</td><td>" + itemList[n].price + "</th><td>" + itemList[n].big_category + "</td><td>" + itemList[n].small_category + "</td></tr>";
             }
             text = text + line + '</table>';
@@ -108,11 +107,11 @@ var drawGraph = function (data_x, data_y, type_chart) {
     }
 };
 
-var reflectChanges = function (ajax_response, type_chart) {
+const reflectChanges = function (ajax_response, type_chart) {
     // グラフを更新
-    var x = [];
-    var y = [];
-    var month_total = ajax_response.month_total
+    const x = [];
+    const y = [];
+    const month_total = ajax_response.month_total
     for (const tmp of month_total) {
         x.push(tmp.month);
         y.push(tmp.total);
@@ -121,7 +120,7 @@ var reflectChanges = function (ajax_response, type_chart) {
     // テーブルを更新
     $("#graph-table").html("");
     target = $("#graph-table");
-    text = "<table class='table'>";
+    var text = "<table class='table'>";
     var line = '';
     for (const tmp of month_total) {
         line = line + "<tr>\n<td>" + tmp.month + "</td>\n<td>" + tmp.total + "円</td>\n</tr>\n";
