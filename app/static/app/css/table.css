@@ -3,30 +3,14 @@
     height: 300px;
     overflow: auto;
 }
-
 .table-wrapper-scroll-y {
     display: block;
 }
 
-.category-select-table {
-    font-size: 28px;
-    text-align: center;
-}
 #graph-table {
     border-top:solid 10px #3ba108;
-    position: absolute;
     text-align: right;
     width: 100%;
-}
-.form-control {
-    font-size: 28px;
-}
-
-#popup-date{
-    position: absolute;
-    height: 10%;
-    margin: .50rem;
-    text-align: center;
 }
 #popup-table{
     position: absolute;
