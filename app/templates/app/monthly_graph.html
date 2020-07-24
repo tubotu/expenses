@@ -9,16 +9,13 @@
 </div>
 
 <!--カテゴリ選択を行うフォーム-->
-<table class="form-table">
-    <tr>
-        <th>大カテゴリ</th>
-        <td>{{ form.big_category }}</td>
-        <th>小カテゴリ</th>
-        <td>{{ form.small_category }}</td>
-        <th>表示期間</th>
-        <td>{{ form.small_category }}</td>
-    </tr>
-</table>
+<ul class="graph-form">
+    <div>大カテゴリ</div>
+    <div>{{ form.big_category }}</div>
+    <div>小カテゴリ</div>
+    <div>{{ form.small_category }}</div>
+</ul>
+
 {% endblock %}
 
 {% block otherjs %}

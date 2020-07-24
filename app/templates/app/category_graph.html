@@ -15,28 +15,25 @@
 </div>
 <!--年月選択を行うフォーム-->
 <div class="form-group" id="datepicker-startview">
-    <table class="form-table">
-        <tr>
-            <th>年月</th>
-            <!-- <label class="col-sm-3 control-label">Start view</label> -->
-            <td>
-                <div class="col-sm-9 form-inline">
-                    <div class="input-group date">
-                        <input type="text" id="date-form">
-                        <span class="input-group-addon">
-                            <i class="glyphicon glyphicon-th"></i>
-                        </span>
-                    </div>
+    <ul class="graph-form">
+        <div>年月</div>
+        <!-- <label class="col-sm-3 control-label">Start view</label> -->
+        <div>
+            <div class="col-sm-9 form-inline">
+                <div class="input-group date">
+                    <input type="text" id="date-form">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-th"></i>
+                    </span>
                 </div>
-            </td>
-        </tr>
-    </table>
-</div>
-{% endblock %}
+            </div>
+        </div>
+    </ul>
 
-{% block otherjs %}
+</div> {% endblock %} {% block otherjs %}
 <script type="text/javascript"
-    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js">
+    </script>
 <script type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.ja.min.js"></script>
 <script type="text/javascript">
