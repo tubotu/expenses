@@ -1,0 +1,13 @@
+.graph-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top : 1.0rem;
+    left: 0px;
+    width: 100%;
+    font-size: 1.0rem;
+}
+
+.graph-form > div {
+    margin-right: 1.0rem;
+}
