@@ -20,7 +20,10 @@
 {% block graph %}
 {% endblock %}
 
-<canvas id=outgoCanvas></canvas>
+<div id=main-graph>
+    <canvas id=outgoCanvas></canvas>
+</div>
+
 
 <!--ポップアップ-->
 <div class="popup-background"></div>
@@ -31,6 +34,7 @@
         <div id="popup-table" class="table-wrapper-scroll-y my-custom-scrollbar"></div>
     </div>
 </div>
+
 <!--表-->
 <div id="graph-table" class="table-wrapper-scroll-y my-custom-scrollbar">
     <table class="table">

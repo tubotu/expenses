@@ -2,8 +2,8 @@
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-top : 1.0rem;
-    left: 0px;
     width: 100%;
     font-size: 1.0rem;
 }
@@ -11,3 +11,13 @@
 .graph-form > div {
     margin-right: 1.0rem;
 }
+
+/*popup close button*/
+.graph-form button {
+    font-size: 1.0rem;
+}
+.graph-form button:hover {
+    /*background: #666666;*/
+    color: #ffffff;
+}
+

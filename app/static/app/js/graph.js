@@ -33,6 +33,12 @@ const drawGraph = function (data_x, data_y, type_chart) {
             ]
         },
         options: {
+            layout: {
+                padding: {
+                    top: 10,
+                    bottom: 10,
+                }
+            },
             title: {
                 display: false,
                 text: 'グラフ'
