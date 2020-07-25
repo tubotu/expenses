@@ -18,7 +18,6 @@ const drawGraph = function (data_x, data_y, type_chart) {
         data: {
             labels: [...data_x],
             datasets: [{
-                label: "A",
                 data: [...data_y],
 
                 backgroundColor: 'rgba(110,121,92,0.1)',
