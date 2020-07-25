@@ -13,24 +13,28 @@
     <a href="{% url 'app:monthly_graph'%}" class="button">日付</a>
     <a href="" class="button" id="now">カテゴリ</a>
 </div>
+
 <!--年月選択を行うフォーム-->
-<div class="form-group" id="datepicker-startview">
-    <ul class="graph-form">
-        <div>年月</div>
-        <!-- <label class="col-sm-3 control-label">Start view</label> -->
-        <div>
-            <div class="col-sm-9 form-inline">
-                <div class="input-group date">
-                    <input type="text" id="date-form">
-                    <span class="input-group-addon">
-                        <i class="glyphicon glyphicon-th"></i>
-                    </span>
-                </div>
+<ul class="graph-form">
+    <div><button class="btn btn-default" id="to-last-month"> < </button></div>
+    <!-- <label class="col-sm-3 control-label">Start view</label> -->
+    <div id="datepicker-startview">
+        <div class="col-sm-9 form-inline">
+            <div class="input-group date">
+                <input type="text" id="date-form">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-th"></i>
+                </span>
             </div>
         </div>
-    </ul>
+    </div>
+    <div><button class="btn btn-default" id="to-next-month"> > </button></div>
+</ul>
 
-</div> {% endblock %} {% block otherjs %}
+
+{% endblock %}
+
+{% block otherjs %}
 <script type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js">
     </script>
@@ -39,6 +43,7 @@
 <script type="text/javascript">
     // init
     const dateElement = $('#date-form');
+    let this_month = Number("{{this_month}}");
     const x = [];
     const y = [];
     {% for tmp in month_total %}
@@ -59,6 +64,17 @@
             reflectChanges(response, "bar")
         });
     };
+    // 1ヵ月の移動
+    $('#to-last-month').on('click', () => {
+        this_month = this_month - 1;
+        $('#datepicker-startview .date').datepicker().datepicker("setDate", "2020/" + String(this_month));
+        changeGraph();
+    });
+    $('#to-next-month').on('click', () => {
+        this_month = this_month + 1;
+        $('#datepicker-startview .date').datepicker().datepicker("setDate", "2020/" + String(this_month));
+        changeGraph();
+    });
     // カテゴリ選択に合わせて実行する処理
     dateElement.on('change', () => {
         changeGraph();
