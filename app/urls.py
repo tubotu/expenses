@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
+from django.views.decorators.cache import cache_control
 
 app_name = "app"
 urlpatterns = [
@@ -37,5 +39,8 @@ urlpatterns = [
         "api/category_graph/get",
         views.ajax_get_category_graph,
         name="ajax_get_category_graph",
+    ),
+    path('sw.js', (TemplateView.as_view(template_name="app/sw.js",
+        content_type='application/javascript', )), name='sw.js'
     ),
 ]

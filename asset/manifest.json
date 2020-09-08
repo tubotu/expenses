@@ -1,0 +1,18 @@
+{
+    "background_color": "#1f1f1f",
+    "description": "goricate",
+    "display": "standalone",
+    "theme_color": "aliceblue",
+    "icons": [{
+      "src": "icon-192x192.png",
+      "sizes": "400x400",
+      "type": "image/png"
+    },{
+      "src": "icon-512x512.png",
+      "sizes": "400x400",
+      "type": "image/png"
+    }],
+    "name": "ゴリゴリカテゴリー",
+    "short_name": "ゴリカテ",
+    "start_url": "/?utm_source=homescreen"
+  }
