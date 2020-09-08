@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="manifest" href="static/manifest.json">
+    <script>
+        window.addEventListener('load', function() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register("sw.js");
+            }
+        });
+    </script>
     {% block extra_head %}{% endblock %}
 </head>
 
